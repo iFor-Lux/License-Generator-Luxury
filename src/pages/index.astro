@@ -79,23 +79,8 @@ import Layout from "../layouts/Layout.astro";
 							id="discord-tech-box"
 							class="tech-box"
 							data-tooltip="Activity Profile"
+							style="display: none;"
 						>
-							<svg
-								id="discord-default-icon"
-								viewBox="0 0 24 24"
-								fill="none"
-								class="react-icon"
-							>
-								<path
-									d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-									stroke="#61dafb"
-									stroke-width="2"></path>
-								<path
-									d="M12 8L12 16M8 12L16 12"
-									stroke="#61dafb"
-									stroke-width="2"
-									stroke-linecap="round"></path>
-							</svg>
 							<img
 								id="discord-activity-icon"
 								src=""
@@ -407,86 +392,67 @@ import Layout from "../layouts/Layout.astro";
 				);
 				const activityIcon = document.getElementById(
 					"discord-activity-icon",
-				);
-				const defaultIcon = document.getElementById(
-					"discord-default-icon",
-				);
+				) as HTMLImageElement;
 				const techBox = document.getElementById("discord-tech-box");
 
-				if (activities.length > 0 || data.data.listening_to_spotify) {
-					let activity = activities.find((a) => a.type !== 4); // Ignorar Custom Status
+				const realActivity = activities.find((a) => a.type !== 4);
+				const isSpotify = data.data.listening_to_spotify;
 
-					// Si escucha Spotify y no hay juego, o si queremos dar prioridad a Spotify
-					if (
-						data.data.listening_to_spotify &&
-						(!activity || activity.name === "Spotify")
-					) {
+				if (realActivity || isSpotify) {
+					// Hay actividad real o Spotify
+					if (isSpotify && (!realActivity || realActivity.name === "Spotify")) {
 						const spotify = data.data.spotify;
-						if (activityNameEl)
-							activityNameEl.textContent = "Spotify";
-						if (activityDetailsEl)
-							activityDetailsEl.textContent = `${spotify.song} - ${spotify.artist}`;
+						if (activityNameEl) activityNameEl.textContent = "Spotify";
+						if (activityDetailsEl) activityDetailsEl.textContent = `${spotify.song} - ${spotify.artist}`;
 
-						if (activityIcon && spotify.album_art_url) {
-							activityIcon.src = spotify.album_art_url;
-							activityIcon.style.display = "block";
-							if (defaultIcon) defaultIcon.style.display = "none";
-							if (techBox)
-								techBox.setAttribute(
-									"data-tooltip",
-									spotify.album,
-								);
-						}
-					} else if (activity) {
-						if (activityNameEl)
-							activityNameEl.textContent = activity.name;
-						if (activityDetailsEl)
-							activityDetailsEl.textContent =
-								activity.details || activity.state || "";
-
-						// Intentar cargar imagen del juego/actividad
-						if (
-							activityIcon &&
-							activity.assets &&
-							activity.assets.large_image
-						) {
-							let url = "";
-							if (activity.assets.large_image.startsWith("mp:")) {
-								url = activity.assets.large_image.replace(
-									"mp:",
-									"https://media.discordapp.net/",
-								);
-							} else {
-								url = `https://cdn.discordapp.com/app-assets/${activity.application_id}/${activity.assets.large_image}.png`;
+						if (spotify.album_art_url) {
+							if (activityIcon) {
+								activityIcon.src = spotify.album_art_url;
+								activityIcon.style.display = "block";
 							}
-							activityIcon.src = url;
-							activityIcon.style.display = "block";
-							if (defaultIcon) defaultIcon.style.display = "none";
-
-							// Añadir el nombre de la actividad como tooltip (evitando textos técnicos)
-							if (techBox)
-								techBox.setAttribute(
-									"data-tooltip",
-									activity.name,
-								);
+							if (techBox) {
+								techBox.style.display = "flex";
+								techBox.setAttribute("data-tooltip", spotify.album);
+							}
 						} else {
-							if (activityIcon)
-								activityIcon.style.display = "none";
-							if (defaultIcon)
-								defaultIcon.style.display = "block";
-							if (techBox)
-								techBox.removeAttribute("data-tooltip");
+							if (techBox) techBox.style.display = "none";
+						}
+					} else if (realActivity) {
+						if (activityNameEl) activityNameEl.textContent = realActivity.name;
+						if (activityDetailsEl) activityDetailsEl.textContent = realActivity.details || realActivity.state || "";
+
+						if (realActivity.assets && realActivity.assets.large_image) {
+							let url = "";
+							if (realActivity.assets.large_image.startsWith("mp:")) {
+								url = realActivity.assets.large_image.replace("mp:", "https://media.discordapp.net/");
+							} else {
+								url = `https://cdn.discordapp.com/app-assets/${realActivity.application_id}/${realActivity.assets.large_image}.png`;
+							}
+							if (activityIcon) {
+								activityIcon.src = url;
+								activityIcon.style.display = "block";
+							}
+							if (techBox) {
+								techBox.style.display = "flex";
+								techBox.setAttribute("data-tooltip", realActivity.name);
+							}
+						} else {
+							if (techBox) techBox.style.display = "none";
 						}
 					}
 				} else {
+					// No hay actividad real (solo offline o custom status)
 					if (activityNameEl)
 						activityNameEl.textContent =
 							status === "offline" ? "Desconectado" : "Online";
 					if (activityDetailsEl)
 						activityDetailsEl.textContent = "Sin actividad";
+
 					if (activityIcon) activityIcon.style.display = "none";
-					if (defaultIcon) defaultIcon.style.display = "block";
-					if (techBox) techBox.removeAttribute("data-tooltip");
+					if (techBox) {
+						techBox.style.display = "none";
+						techBox.removeAttribute("data-tooltip");
+					}
 				}
 			}
 		} catch (error) {
