@@ -5,7 +5,31 @@
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Premium Experience</title>
+		<title>@Luxury</title>
+		<script is:inline>
+			(function animateTitle() {
+				const fullTitle = "@Luxury";
+				let index = 1; 
+				let direction = 1;
+				const speed = 250;
+
+				function update() {
+					document.title = fullTitle.substring(0, index + 1);
+					
+					if (direction === 1 && index === fullTitle.length - 1) {
+						direction = -1;
+						setTimeout(update, 3000); // Pausa cuando está completo
+					} else if (direction === -1 && index === 1) {
+						direction = 1;
+						setTimeout(update, 1000); // Pausa en '@'
+					} else {
+						index += direction;
+						setTimeout(update, direction === 1 ? speed : speed / 2);
+					}
+				}
+				update();
+			})();
+		</script>
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap" rel="stylesheet">
