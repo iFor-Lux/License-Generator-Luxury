@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Premium Experience</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap" rel="stylesheet">
+	</head>
+	<body>
+		<div class="bg-gradient"></div>
+		<slot />
+	</body>
+</html>
+
+<style is:global>
+	:root {
+		--bg-dark: #050505;
+		--accent: 136, 58, 234;
+		--accent-light: 224, 204, 250;
+		--accent-gradient: linear-gradient(
+			45deg,
+			rgb(var(--accent)),
+			rgb(var(--accent-light)) 30%,
+			white 60%
+		);
+	}
+	* {
+		box-sizing: border-box;
+		margin: 0;
+		padding: 0;
+		font-family: 'Geist Mono', monospace !important;
+	}
+
+	html,
+	body {
+		margin: 0;
+		width: 100%;
+		min-height: 100%;
+		background-color: var(--bg-dark);
+		font-family: 'Geist Mono', monospace;
+		color: white;
+		overflow-x: hidden;
+	}
+
+	.bg-gradient {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: 
+			linear-gradient(rgba(5, 5, 5, 0.6), rgba(5, 5, 5, 0.6)),
+			url('/bg.png') center/cover no-repeat;
+		z-index: -1;
+	}
+</style>
