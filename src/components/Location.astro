@@ -1,0 +1,88 @@
+---
+---
+
+<div class="location-footer">
+	<div class="location-pill" data-tooltip="@iFor._ez">
+		<div class="pill-item">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pill-icon eye-icon">
+				<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+				<circle cx="12" cy="12" r="3"></circle>
+			</svg>
+			<span class="pill-text">12,348</span>
+		</div>
+		<span class="pill-sep">|</span>
+		<div class="pill-item">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pill-icon map-icon">
+				<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+				<circle cx="12" cy="10" r="3"></circle>
+			</svg>
+			<span class="pill-text">&lt;$</span>
+		</div>
+	</div>
+</div>
+
+<style is:global>
+	/* Estilos para Sección de Ubicación Final - Minimalista */
+	.location-footer {
+		position: absolute;
+		bottom: 1.5rem;
+		right: 2.2rem;
+		display: flex;
+		align-items: center;
+		z-index: 20;
+	}
+
+	.location-pill {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		background: transparent;
+		color: #ffcc33;
+		font-family: "Geist Mono", monospace !important;
+		font-size: 0.8rem;
+		letter-spacing: 0.5px;
+		cursor: help;
+		opacity: 0.35;
+		transition: opacity 0.3s ease;
+	}
+
+	.location-pill:hover {
+		opacity: 1;
+	}
+
+	.pill-item {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+	}
+
+	.pill-icon {
+		width: 14px;
+		height: 14px;
+		color: #ffcc33;
+	}
+
+	.pill-sep {
+		opacity: 0.2;
+		font-weight: 200;
+	}
+
+	.pill-text {
+		font-weight: 400;
+	}
+
+	@media (max-width: 650px) {
+		.location-footer {
+			position: relative;
+			bottom: auto;
+			right: auto;
+			justify-content: flex-end;
+			margin-top: -0.5rem;
+			padding-right: 0.5rem;
+		}
+		.location-pill {
+			opacity: 0.7;
+			gap: 0.5rem;
+		}
+	}
+</style>

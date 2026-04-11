@@ -1,0 +1,338 @@
+---
+---
+
+<div class="card discord-card">
+	<div class="card-left">
+		<div class="pfp-container">
+			<img
+				id="discord-pfp"
+				class="pfp-circle"
+				src=""
+				alt=""
+				style="display: none;"
+			/>
+			<div
+				id="discord-pfp-placeholder"
+				class="pfp-circle"
+			>
+			</div>
+			<div id="discord-status" class="status-dot"></div>
+		</div>
+		<div class="info">
+			<div class="name-row">
+				<span id="discord-username" class="username"
+				></span>
+			</div>
+			<p id="discord-activity-name" class="subtitle"></p>
+			<p id="discord-activity-details" class="details">
+			</p>
+		</div>
+	</div>
+	<div class="card-right">
+		<div
+			id="discord-tech-box"
+			class="tech-box"
+			data-tooltip="Activity Profile"
+			style="display: none;"
+		>
+			<img
+				id="discord-activity-icon"
+				src=""
+				alt=""
+				style="display: none; width: 100%; height: 100%; border-radius: 10px; object-fit: cover;"
+			/>
+		</div>
+	</div>
+</div>
+
+<script>
+	// --- LOGICA DE LANYARD (DISCORD) ---
+	const DISCORD_ID = "1033641221354164294";
+
+	async function updateDiscordStatus() {
+		try {
+			const response = await fetch(
+				`https://api.lanyard.rest/v1/users/${DISCORD_ID}`,
+			);
+			const data = await response.json();
+
+			if (data.success) {
+				const user = data.data.discord_user;
+				const status = data.data.discord_status;
+				const activities = data.data.activities;
+
+				// Actualizar nombre y PFP
+				const usernameEl = document.getElementById("discord-username");
+				const pfpEl = document.getElementById("discord-pfp");
+				const pfpPlaceholder = document.getElementById(
+					"discord-pfp-placeholder",
+				);
+
+				if (usernameEl) usernameEl.textContent = user.username;
+
+				if (pfpEl && user.avatar) {
+					pfpEl.src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.webp?size=128`;
+					pfpEl.style.display = "block";
+					if (pfpPlaceholder) pfpPlaceholder.style.display = "none";
+				}
+
+				// Actualizar punto de estado
+				const statusDot = document.getElementById("discord-status");
+				if (statusDot) {
+					statusDot.className = `status-dot ${status}`;
+				}
+
+				// Actualizar actividad
+
+				const activityNameEl = document.getElementById(
+					"discord-activity-name",
+				);
+				const activityDetailsEl = document.getElementById(
+					"discord-activity-details",
+				);
+				const activityIcon = document.getElementById(
+					"discord-activity-icon",
+				) as HTMLImageElement;
+				const techBox = document.getElementById("discord-tech-box");
+
+				const realActivity = activities.find((a) => a.type !== 4);
+				const isSpotify = data.data.listening_to_spotify;
+
+				if (realActivity || isSpotify) {
+					// Hay actividad real o Spotify
+					if (isSpotify && (!realActivity || realActivity.name === "Spotify")) {
+						const spotify = data.data.spotify;
+						if (activityNameEl) activityNameEl.textContent = "Spotify";
+						if (activityDetailsEl) activityDetailsEl.textContent = `${spotify.song} - ${spotify.artist}`;
+
+						if (spotify.album_art_url) {
+							if (activityIcon) {
+								activityIcon.src = spotify.album_art_url;
+								activityIcon.style.display = "block";
+							}
+							if (techBox) {
+								techBox.style.display = "flex";
+								techBox.setAttribute("data-tooltip", spotify.album);
+							}
+						} else {
+							if (techBox) techBox.style.display = "none";
+						}
+					} else if (realActivity) {
+						if (activityNameEl) activityNameEl.textContent = realActivity.name;
+						if (activityDetailsEl) activityDetailsEl.textContent = realActivity.details || realActivity.state || "";
+
+						if (realActivity.assets && realActivity.assets.large_image) {
+							let url = "";
+							if (realActivity.assets.large_image.startsWith("mp:")) {
+								url = realActivity.assets.large_image.replace("mp:", "https://media.discordapp.net/");
+							} else {
+								url = `https://cdn.discordapp.com/app-assets/${realActivity.application_id}/${realActivity.assets.large_image}.png`;
+							}
+							if (activityIcon) {
+								activityIcon.src = url;
+								activityIcon.style.display = "block";
+							}
+							if (techBox) {
+								techBox.style.display = "flex";
+								techBox.setAttribute("data-tooltip", realActivity.name);
+							}
+						} else {
+							if (techBox) techBox.style.display = "none";
+						}
+					}
+				} else {
+					// No hay actividad real (solo offline o custom status)
+					if (activityNameEl)
+						activityNameEl.textContent =
+							status === "offline" ? "Desconectado" : "Online";
+					if (activityDetailsEl)
+						activityDetailsEl.textContent = "Sin actividad";
+
+					if (activityIcon) activityIcon.style.display = "none";
+					if (techBox) {
+						techBox.style.display = "none";
+						techBox.removeAttribute("data-tooltip");
+					}
+				}
+			}
+		} catch (error) {
+			console.error("Error fetching Discord status:", error);
+		}
+	}
+
+	// Ejecutar al cargar y cada 30 segundos
+	updateDiscordStatus();
+	setInterval(updateDiscordStatus, 30000);
+</script>
+
+<style is:global>
+	.card {
+		width: 100%;
+		max-width: 312px;
+		background: rgba(255, 255, 255, 0.06);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: 28px;
+		padding: 0.8rem 1rem;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.8rem;
+		position: relative;
+		transition: none;
+		min-height: 100px;
+		overflow: visible !important;
+	}
+
+	.card:hover {
+		z-index: 100;
+	}
+
+	.card-left {
+		display: flex;
+		align-items: center;
+		gap: 0.85rem;
+	}
+
+	.info {
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
+		min-width: 0;
+	}
+
+	/* Discord Card Specifics */
+	.pfp-container {
+		position: relative;
+	}
+
+	.pfp-circle {
+		width: 75px;
+		height: 75px;
+		border-radius: 50%;
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		object-fit: cover;
+	}
+
+	.status-dot {
+		position: absolute;
+		bottom: 2px;
+		right: 2px;
+		width: 16px;
+		height: 16px;
+		background: #80848e;
+		border-radius: 50%;
+		border: 3px solid #0f0f0f;
+		transition: none;
+	}
+
+	.status-dot.online {
+		background: #23a55a;
+	}
+	.status-dot.idle {
+		background: #f0b232;
+	}
+	.status-dot.dnd {
+		background: #f23f43;
+	}
+	.status-dot.offline {
+		background: #80848e;
+	}
+
+	.username {
+		font-family: inherit;
+		font-weight: 200;
+		color: #ffcc33;
+		font-size: 0.95rem;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.subtitle,
+	.details {
+		font-family: inherit;
+		font-weight: 200;
+		font-size: 0.75rem;
+		color: rgba(255, 255, 255, 0.35);
+		margin: 0;
+		line-height: 1.2;
+	}
+
+	.tech-box {
+		width: 75px;
+		height: 75px;
+		background: rgba(0, 0, 0, 0.4);
+		border-radius: 12px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border: 1px solid rgba(255, 255, 255, 0.05);
+		flex-shrink: 0;
+		overflow: visible !important;
+		position: relative;
+	}
+
+	.activity-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	/* Tooltip Burbuja */
+	[data-tooltip] {
+		position: relative;
+	}
+
+	[data-tooltip]::after {
+		content: attr(data-tooltip);
+		position: absolute;
+		bottom: 110%;
+		left: 50%;
+		transform: translateX(-50%);
+		background: rgba(20, 20, 20, 0.7);
+		backdrop-filter: blur(18px);
+		-webkit-backdrop-filter: blur(18px);
+		color: #ffffff;
+		padding: 0.5rem 0.8rem;
+		border-radius: 10px;
+		font-size: 0.75rem;
+		font-family: "Geist Mono", monospace !important;
+		font-weight: 400;
+		white-space: nowrap;
+		opacity: 0;
+		visibility: hidden;
+		transition: none;
+		pointer-events: none;
+		z-index: 1000000;
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+	}
+
+	[data-tooltip]:hover::after {
+		opacity: 1;
+		visibility: visible;
+		transform: translateX(-50%);
+	}
+
+	@media (max-width: 650px) {
+		.card {
+			max-width: 100%;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.pfp-circle {
+			width: 60px;
+			height: 60px;
+		}
+		.tech-box {
+			width: 60px;
+			height: 60px;
+		}
+		.username {
+			font-size: 0.85rem;
+		}
+	}
+</style>

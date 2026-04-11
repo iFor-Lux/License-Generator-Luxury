@@ -1,0 +1,194 @@
+---
+---
+
+<div class="profile-row">
+	<div class="image-wrapper">
+		<m3e-shape name="7-sided-cookie" class="cookie-shape">
+			<img
+				src="profile.png"
+				alt="Profile"
+				class="profile-img"
+			/>
+		</m3e-shape>
+	</div>
+	<div class="content">
+		<h1 class="title">
+			<span id="typewriter"></span>
+			<div class="badge-wrapper" data-tooltip="Verificado">
+				<svg class="verified-badge" viewBox="1 1.5 22 21">
+					<path
+						fill="currentColor"
+						d="m8.6 22.5l-1.9-3.2l-3.6-.8l.35-3.7L1 12l2.45-2.8l-.35-3.7l3.6-.8l1.9-3.2L12 2.95l3.4-1.45l1.9 3.2l3.6.8l-.35 3.7L23 12l-2.45 2.8l.35 3.7l-3.6.8l-1.9 3.2l-3.4-1.45l-3.4 1.45Z"
+					></path>
+					<path
+						fill="white"
+						d="M10.95 15.55L16.6 9.9l-1.4-1.45l-4.25 4.25l-2.15-2.1L7.4 12l3.55 3.55Z"
+					></path>
+				</svg>
+			</div>
+		</h1>
+		<p class="description">
+			Somos @Luxuryregedit, una empresa con más de 5 años de
+			experiencia en el mercado siempre entregando el mejor
+			producto al menor precio posible.
+		</p>
+	</div>
+</div>
+
+<script>
+	import "@m3e/web/shape";
+	import Typewriter from "typewriter-effect/dist/core";
+
+	// --- LOGICA DE TYPEWRITER ---
+	const typewriterElement = document.getElementById("typewriter");
+	if (typewriterElement) {
+		new Typewriter(typewriterElement, {
+			strings: [
+				"Luxury<span class='news-font'> Regedit</span>",
+				"Premium<span class='news-font'> Hax</span>",
+				"Always<span class='news-font'> Quality</span>",
+				"Best<span class='news-font'> Price</span>",
+			],
+			autoStart: true,
+			loop: true,
+			delay: 45,
+			deleteSpeed: 30,
+			pauseFor: 1500,
+			cursor: "|",
+		});
+	}
+</script>
+
+<style is:global>
+	/* Fila de Perfil */
+	.profile-row {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 2rem;
+		width: 100%;
+		transition: all 0.3s ease;
+	}
+
+	.image-wrapper {
+		flex-shrink: 0;
+	}
+
+	.cookie-shape {
+		width: 130px;
+		height: 130px;
+		display: block;
+		overflow: hidden;
+		--m3e-shape-color: transparent;
+	}
+
+	.profile-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.6s ease;
+	}
+
+	.profile-img:hover {
+		transform: scale(1.1);
+	}
+
+	.content {
+		text-align: left;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		padding-top: 0;
+	}
+
+	.title {
+		font-size: 34.5px;
+		font-weight: 600;
+		color: #ffcc33;
+		margin: 0 0 0.5rem 0;
+		letter-spacing: -0.01em;
+		text-shadow: 0 0 20px rgba(255, 204, 51, 0.2);
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		min-height: 2.5rem;
+	}
+
+	.verified-badge {
+		width: 18px;
+		height: 18px;
+		color: #00bfff;
+		flex-shrink: 0;
+	}
+
+	.badge-wrapper {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 6px;
+		background: rgba(255, 255, 255, 0.03);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		border-radius: 12px;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		margin-left: 4px;
+		transition: all 0.3s ease;
+	}
+
+	.badge-wrapper:hover {
+		background: rgba(255, 255, 255, 0.08);
+		border-color: rgba(0, 191, 255, 0.3);
+		transform: scale(1.05);
+	}
+
+	.description {
+		font-family: inherit;
+		font-size: 0.95rem;
+		font-weight: 300;
+		color: rgba(255, 255, 255, 0.8);
+		line-height: 1.5;
+		margin: 0;
+		letter-spacing: -0.01em;
+	}
+
+	.news-font {
+		font-family: "Newsreader", serif !important;
+		font-style: italic;
+		font-weight: 700;
+		margin-left: 0;
+	}
+
+	@media (max-width: 650px) {
+		.profile-row {
+			flex-direction: row;
+			gap: 1.25rem;
+		}
+		.content {
+			text-align: left;
+		}
+		.title {
+			justify-content: flex-start;
+			font-size: 1.35rem;
+			white-space: nowrap;
+			flex-wrap: nowrap;
+		}
+		.description {
+			font-size: 0.9rem;
+			max-width: 450px;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.cookie-shape {
+			width: 110px;
+			height: 110px;
+		}
+		.title {
+			font-size: 1.2rem;
+			gap: 0.35rem;
+		}
+		.badge-wrapper {
+			padding: 4px;
+		}
+	}
+</style>

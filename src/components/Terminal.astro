@@ -1,0 +1,733 @@
+---
+---
+
+<div class="terminal-container">
+	<div class="terminal-window">
+		<div class="terminal-ambient-glow"></div>
+		<div class="terminal-nav">
+			<div class="terminal-dots">
+				<div class="dot d-red"></div>
+				<div class="dot d-yellow"></div>
+				<div class="dot d-green"></div>
+			</div>
+			<div class="terminal-title">luxury-terminal</div>
+		</div>
+		<div class="terminal-viewport">
+			<div id="terminal-content" class="terminal-log">
+				<div class="log-line">
+					<span class="p-prompt">luxury:~$</span>
+					<span>system --status</span>
+				</div>
+				<div class="log-line">
+					<span class="p-success">✓ </span>
+					<span
+						>System operational. Ready for generation.</span
+					>
+				</div>
+			</div>
+		</div>
+		<div class="terminal-footer">
+			<div class="footer-spacer-l"></div>
+			<button id="generate-btn" class="terminal-btn">
+				<span class="btn-text">Generar Licencia</span>
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2.5"
+					class="btn-icon"
+				>
+					<path
+						d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"
+					></path>
+				</svg>
+			</button>
+			<div class="footer-spacer-r"></div>
+			<div
+				id="license-output"
+				class="terminal-output"
+			>
+				<code id="license-code"></code>
+				<button id="copy-btn" class="copy-small" data-tooltip="Copiar">
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2.5"
+						class="copy-icon-s"
+					>
+						<rect
+							x="9"
+							y="9"
+							width="13"
+							height="13"
+							rx="2"
+							ry="2"></rect>
+						<path
+							d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+						></path>
+					</svg>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	import confetti from "canvas-confetti";
+
+	// --- LOGICA DEL GENERADOR ACETERNITY ---
+	const genBtn = document.getElementById("generate-btn");
+	const terminalContent = document.getElementById("terminal-content");
+	const licenseOutput = document.getElementById("license-output");
+	const licenseCode = document.getElementById("license-code");
+	const copyBtn = document.getElementById("copy-btn");
+
+	// Funciones de Confeti
+	const triggerFireworks = () => {
+		const duration = 5 * 1000;
+		const animationEnd = Date.now() + duration;
+		const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+		const randomInRange = (min, max) => Math.random() * (max - min) + min;
+
+		const interval = window.setInterval(() => {
+			const timeLeft = animationEnd - Date.now();
+
+			if (timeLeft <= 0) {
+				return clearInterval(interval);
+			}
+
+			const particleCount = 50 * (timeLeft / duration);
+			confetti({
+				...defaults,
+				particleCount,
+				origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+			});
+			confetti({
+				...defaults,
+				particleCount,
+				origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+			});
+		}, 250);
+	};
+
+	const triggerSimpleConfetti = () => {
+		confetti({
+			particleCount: 100,
+			spread: 70,
+			origin: { y: 0.6 }
+		});
+	};
+
+	// Función mejorada para animar escritura con soporte para múltiples colores
+	async function typeMultiColorLine(container, segments) {
+		const line = document.createElement("div");
+		line.className = "log-line";
+		container.appendChild(line);
+
+		for (const segment of segments) {
+			const span = document.createElement("span");
+			if (segment.className) span.className = segment.className;
+			line.appendChild(span);
+
+			for (let i = 0; i < segment.text.length; i++) {
+				span.textContent += segment.text[i];
+				await new Promise((r) => setTimeout(r, 10)); // Más rápido para mejor sensación
+			}
+		}
+
+		const viewport = container.closest(".terminal-viewport");
+		if (viewport) viewport.scrollTop = viewport.scrollHeight;
+	}
+
+	let hasGenerated = false;
+
+	if (genBtn && terminalContent && licenseOutput) {
+		genBtn.addEventListener("click", async () => {
+			if (hasGenerated) return;
+
+			// Disparar confeti según dispositivo
+			const isMobile = window.innerWidth < 1024;
+			if (isMobile) {
+				triggerSimpleConfetti();
+			} else {
+				triggerFireworks();
+			}
+
+			hasGenerated = true; // Bloqueo inmediato por estado
+
+			genBtn.disabled = true;
+			genBtn.classList.add("is-generated");
+
+			// Cambiar texto a estado dinámico
+			const btnText = genBtn.querySelector(".btn-text");
+			if (btnText) btnText.textContent = "Generando...";
+			genBtn.style.opacity = "0.5";
+			licenseOutput.style.display = "none";
+
+			terminalContent.innerHTML += `<div class="log-separator"></div>`;
+
+			const steps = [
+				{
+					type: "multi",
+					segments: [
+						{ text: "[INFO] ", className: "p-blue" },
+						{
+							text: "Conectando con nodo regional (México/LATAM)...",
+							className: "p-gray",
+						},
+					],
+				},
+				{
+					type: "multi",
+					segments: [
+						{ text: "luxury:~$ ", className: "p-prompt" },
+						{
+							text: "ssh master-db.luxury-api.io --secure",
+							className: "p-white",
+						},
+					],
+				},
+				{
+					type: "multi",
+					segments: [
+						{ text: "[AUTH] ", className: "p-blue" },
+						{ text: "Session ID for ", className: "p-gray" },
+						{ text: "0x77A0F", className: "p-purple" },
+						{ text: " established.", className: "p-gray" },
+					],
+				},
+				{
+					type: "multi",
+					segments: [
+						{ text: "[WAIT] ", className: "p-yellow" },
+						{
+							text: "Validando integridad de base de datos...",
+							className: "p-gray",
+						},
+					],
+				},
+				{
+					type: "multi",
+					segments: [
+						{ text: "luxury:~$ ", className: "p-prompt" },
+						{
+							text: "SELECT * FROM core_nodes WHERE region='GLOBAL';",
+							className: "p-white",
+						},
+					],
+				},
+				{
+					type: "multi",
+					segments: [
+						{ text: "[QUERY] ", className: "p-yellow" },
+						{
+							text: "Found cluster match on ",
+							className: "p-gray",
+						},
+						{ text: "node-alpha-04", className: "p-blue" },
+					],
+				},
+				{
+					type: "multi",
+					segments: [
+						{ text: "✓ ", className: "p-success" },
+						{
+							text: "RSA Handshake accepted (2048-bit).",
+							className: "p-gray",
+						},
+					],
+				},
+				{
+					type: "multi",
+					segments: [
+						{ text: "[DB] ", className: "p-blue" },
+						{
+							text: "Sincronizando registros de usuario premium...",
+							className: "p-gray",
+						},
+					],
+				},
+				{
+					type: "multi",
+					segments: [
+						{ text: "[FETCH] ", className: "p-purple" },
+						{
+							text: "Acquiring premium metadata for ",
+							className: "p-gray",
+						},
+						{ text: "lux_88291", className: "p-white" },
+					],
+				},
+				{
+					type: "multi",
+					segments: [
+						{ text: "[OK] ", className: "p-success" },
+						{
+							text: "Usuario verificado con éxito.",
+							className: "p-gray",
+						},
+					],
+				},
+				{
+					type: "multi",
+					segments: [
+						{ text: "✓ ", className: "p-success" },
+						{
+							text: "DONE: Security token deployed.",
+							className: "p-gray",
+						},
+					],
+				},
+			];
+
+			for (const step of steps) {
+				await typeMultiColorLine(terminalContent, step.segments);
+				await new Promise((r) => setTimeout(r, 100));
+			}
+
+			const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+			const part = () =>
+				Array.from(
+					{ length: 4 },
+					() => chars[Math.floor(Math.random() * chars.length)],
+				).join("");
+			const key = `LUXURY-${part()}-${part()}-${part()}`;
+
+			licenseCode.textContent = key;
+			
+			// Activar animación de transformación coordinada
+			const terminalFooter = genBtn.closest(".terminal-footer");
+			if (terminalFooter) {
+				terminalFooter.classList.add("is-finished");
+			}
+			licenseOutput.style.display = "flex";
+
+			// Transformación Ultra-Minimalista con estructura para cross-fade
+			genBtn.innerHTML = `
+				<div class="minimal-status">
+					<div class="status-content activated-state">
+						<span class="m-check">✓</span> 
+						<span class="status-label">ACTIVATED</span>
+					</div>
+					<div class="status-content timer-state" style="opacity: 0; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none;">
+						<span class="status-label timer-label">RESET EN: --:--:--</span>
+					</div>
+				</div>
+			`;
+
+			// Transición sutil al temporizador después de un breve momento
+			setTimeout(() => {
+				const activatedState = genBtn.querySelector(".activated-state");
+				const timerState = genBtn.querySelector(".timer-state");
+				const minimalStatus = genBtn.querySelector(".minimal-status");
+				
+				if (activatedState && timerState && minimalStatus) {
+					let secondsLeft = 24 * 60 * 60;
+
+					// Cross-fade suave
+					activatedState.style.opacity = "0";
+					timerState.style.opacity = "1";
+					timerState.style.position = "relative";
+					timerState.style.pointerEvents = "auto";
+					activatedState.style.position = "absolute";
+
+					minimalStatus.classList.add("is-timer");
+
+					const updateTimer = () => {
+						const h = Math.floor(secondsLeft / 3600);
+						const m = Math.floor((secondsLeft % 3600) / 60);
+						const s = secondsLeft % 60;
+						const timerLabel = timerState.querySelector(".timer-label");
+						if (timerLabel) {
+							timerLabel.innerHTML = `RESET EN: <span class="status-timer">${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}</span>`;
+						}
+					};
+
+					updateTimer();
+					const timerInterval = setInterval(() => {
+						secondsLeft--;
+						if (secondsLeft >= 0) {
+							updateTimer();
+						} else {
+							clearInterval(timerInterval);
+						}
+					}, 1000);
+				}
+			}, 2500);
+			genBtn.classList.add("is-activated");
+			genBtn.title = "License Active";
+		});
+
+		if (copyBtn) {
+			copyBtn.addEventListener("click", () => {
+				navigator.clipboard.writeText(licenseCode.textContent);
+				const icon = copyBtn.innerHTML;
+				copyBtn.innerHTML = "✓";
+				copyBtn.setAttribute("data-tooltip", "Copiado");
+				setTimeout(() => {
+					copyBtn.innerHTML = icon;
+					copyBtn.setAttribute("data-tooltip", "Copiar");
+				}, 2000);
+			});
+		}
+	}
+</script>
+
+<style is:global>
+	.terminal-container {
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		padding-top: 0;
+	}
+
+	.terminal-window {
+		width: 100%;
+		background: rgba(0, 0, 0, 0.3) !important;
+		backdrop-filter: blur(25px) !important;
+		-webkit-backdrop-filter: blur(25px) !important;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 12px;
+		overflow: hidden;
+		box-shadow: 0 40px 100px -30px rgba(0, 0, 0, 1);
+		display: flex;
+		flex-direction: column;
+	}
+
+	.terminal-nav {
+		background: transparent;
+		padding: 0.75rem 1.25rem;
+		display: flex;
+		align-items: center;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		position: relative;
+	}
+
+	.terminal-ambient-glow {
+		position: absolute;
+		top: -60px;
+		right: -60px;
+		width: 250px;
+		height: 250px;
+		background: radial-gradient(
+			circle at 70% 30%,
+			rgba(255, 204, 51, 0.4) 0%,
+			rgba(255, 204, 51, 0.08) 40%,
+			transparent 80%
+		);
+		filter: blur(40px);
+		pointer-events: none;
+		z-index: 10;
+	}
+
+	.terminal-dots {
+		display: flex;
+		gap: 0.5rem;
+		z-index: 2;
+	}
+
+	.dot {
+		width: 11px;
+		height: 11px;
+		border-radius: 50%;
+	}
+	.d-red { background: #ff5f56; }
+	.d-yellow { background: #ffbd2e; }
+	.d-green { background: #27c93f; }
+
+	.terminal-title {
+		font-family: inherit;
+		font-weight: 100;
+		font-size: 0.7rem;
+		color: rgba(255, 255, 255, 0.3);
+		pointer-events: none;
+		position: absolute;
+		left: 0;
+		right: 0;
+		text-align: center;
+		z-index: 1;
+	}
+
+	.terminal-viewport {
+		padding: 1rem 1.25rem;
+		min-height: auto;
+		max-height: 250px;
+		overflow-y: auto;
+		scrollbar-width: thin;
+		scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+	}
+
+	.terminal-log {
+		display: flex;
+		flex-direction: column;
+		gap: 0.2rem;
+	}
+
+	.log-line,
+	.log-line *,
+	.terminal-nav *,
+	.terminal-footer * {
+		font-family: "Geist Mono", monospace !important;
+		font-weight: 300 !important;
+		font-size: 0.85rem !important;
+	}
+
+	.log-line {
+		color: rgba(255, 255, 255, 0.7);
+		line-height: 1.4;
+		word-break: break-all;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+
+	.p-prompt { color: rgba(0, 242, 255, 0.8); margin-right: 0.75rem; }
+	.p-success { color: rgba(57, 255, 20, 0.8); }
+	.p-white { color: #ffffff; }
+	.p-gray { color: rgba(255, 255, 255, 0.5); }
+	.p-blue { color: #00a2ff; }
+	.p-yellow { color: #ffcc33; }
+	.p-red { color: #ff4d4d; }
+	.p-purple { color: #bf00ff; }
+
+	.log-separator {
+		height: 1px;
+		background: rgba(255, 255, 255, 0.05);
+		margin: 0.5rem 0;
+	}
+
+	.terminal-footer {
+		padding: 1.25rem 1.5rem;
+		background: transparent;
+		border-top: 1px solid rgba(255, 255, 255, 0.05);
+		display: flex;
+		align-items: center;
+		min-height: 85px;
+		gap: 0;
+		transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.terminal-footer.is-finished {
+		padding-left: 1rem; 
+		gap: 1.25rem; 
+	}
+
+	.footer-spacer-l,
+	.footer-spacer-r {
+		flex: 1;
+		width: auto;
+		transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.terminal-footer.is-finished .footer-spacer-l,
+	.terminal-footer.is-finished .footer-spacer-r {
+		flex: 0;
+		width: 0;
+	}
+
+	.terminal-btn {
+		background: #ffffff;
+		color: #000000;
+		border: none;
+		padding: 0.65rem 1.5rem;
+		border-radius: 8px;
+		font-weight: 200;
+		font-size: 0.85rem;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.75rem;
+		transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease, transform 0.2s ease;
+		white-space: nowrap;
+		flex-shrink: 0;
+		z-index: 10;
+		min-width: 170px;
+	}
+
+	.terminal-btn.is-activated {
+		background: transparent !important;
+		border: none !important;
+		color: #39ff14 !important;
+		cursor: default !important;
+		pointer-events: none !important;
+		padding: 0 !important;
+		box-shadow: none !important;
+		min-width: 185px;
+	}
+
+	.status-content {
+		transition: opacity 0.4s ease, transform 0.4s ease;
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+	}
+
+	.minimal-status {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		padding: 0.5rem 1rem;
+		background: rgba(30, 30, 30, 0.4);
+		backdrop-filter: blur(10px);
+		border: 1px solid rgba(57, 255, 20, 0.2);
+		border-radius: 10px;
+		color: #39ff14;
+		font-family: inherit;
+		letter-spacing: 0.05em;
+		font-size: 0.75rem;
+		animation: statusFade 0.5s ease-out;
+	}
+
+	.minimal-status.is-timer {
+		border-color: rgba(255, 204, 51, 0.3);
+		color: #ffcc33;
+	}
+
+	.status-timer {
+		font-weight: 400;
+		color: rgba(255, 204, 51, 0.82);
+		font-family: "Geist Mono", monospace !important;
+	}
+
+	@keyframes statusFade {
+		from { opacity: 0; transform: scale(0.95); }
+		to { opacity: 1; transform: scale(1); }
+	}
+
+	.m-check { font-size: 1.1rem; }
+
+	.terminal-btn:hover { background: #e0e0e0; transform: scale(1.02); }
+
+	.btn-icon { width: 16px; height: 16px; }
+
+	.terminal-btn.is-generated .btn-icon {
+		animation: spin 1.5s linear infinite;
+		opacity: 0.7;
+	}
+
+	@keyframes spin {
+		from { transform: rotate(0deg); }
+		to { transform: rotate(360deg); }
+	}
+
+	.terminal-output {
+		flex: 1;
+		min-width: 0;
+		max-width: 0;
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		padding: 0;
+		border-radius: 8px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		opacity: 0;
+		transform: translateX(10px);
+		visibility: hidden;
+		transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+		overflow: visible !important;
+		white-space: nowrap;
+	}
+
+	.terminal-footer.is-finished .terminal-output {
+		display: flex !important;
+		opacity: 1;
+		max-width: 500px;
+		padding: 0.65rem 1rem;
+		transform: translateX(0);
+		visibility: visible;
+		border-width: 1px;
+	}
+
+	.terminal-output code {
+		font-family: inherit !important;
+		font-weight: 100 !important;
+		color: #ffffff;
+		font-size: 1rem;
+		letter-spacing: 0.5px;
+	}
+
+	.copy-small {
+		background: transparent;
+		border: none;
+		color: rgba(255, 255, 255, 0.4);
+		cursor: pointer;
+		padding: 4px;
+		transition: color 0.2s;
+	}
+
+	.copy-small:hover { color: #fff; }
+	.copy-icon-s { width: 16px; height: 16px; }
+
+	@media (max-width: 650px) {
+		.terminal-footer { 
+			flex-direction: row; 
+			align-items: center; 
+			justify-content: center;
+			gap: 0.5rem; 
+			min-height: 0;
+			padding: 0.85rem 1rem;
+		}
+		.footer-spacer-l, .footer-spacer-r {
+			display: none;
+		}
+		.terminal-btn { 
+			width: auto; 
+			min-width: 100px; 
+			padding: 0.4rem 0.75rem;
+			font-size: 0.65rem !important;
+		}
+		.terminal-btn.is-activated {
+			min-width: 110px;
+			flex: none;
+		}
+		.terminal-footer.is-finished .terminal-output {
+			display: flex !important;
+			max-width: 44px !important;
+			width: 44px !important;
+			margin-top: 0;
+			padding: 0 !important;
+			flex: none;
+			justify-content: center;
+			align-items: center;
+		}
+		.terminal-footer.is-finished #license-code {
+			display: none !important;
+		}
+		.terminal-footer.is-finished {
+			padding: 0.85rem 1rem !important;
+		}
+		.terminal-output {
+			display: none;
+		}
+		.terminal-output #license-code {
+			display: none !important;
+		}
+		.terminal-output {
+			min-width: 44px !important;
+			width: 44px !important;
+			padding: 0 !important;
+			justify-content: center;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.terminal-viewport {
+			max-height: 200px;
+			padding: 0.75rem 1rem;
+		}
+		.log-line, .log-line * {
+			font-size: 0.75rem !important;
+		}
+		.terminal-nav {
+			padding: 0.5rem 1rem;
+		}
+		.terminal-title {
+			font-size: 0.6rem;
+		}
+	}
+</style>
