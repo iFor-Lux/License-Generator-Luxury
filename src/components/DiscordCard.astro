@@ -1,4 +1,5 @@
 ---
+
 ---
 
 <div class="card discord-card">
@@ -11,21 +12,15 @@
 				alt=""
 				style="display: none;"
 			/>
-			<div
-				id="discord-pfp-placeholder"
-				class="pfp-circle"
-			>
-			</div>
+			<div id="discord-pfp-placeholder" class="pfp-circle"></div>
 			<div id="discord-status" class="status-dot"></div>
 		</div>
 		<div class="info">
 			<div class="name-row">
-				<span id="discord-username" class="username"
-				></span>
+				<span id="discord-username" class="username"></span>
 			</div>
 			<p id="discord-activity-name" class="subtitle"></p>
-			<p id="discord-activity-details" class="details">
-			</p>
+			<p id="discord-activity-details" class="details"></p>
 		</div>
 	</div>
 	<div class="card-right">
@@ -100,10 +95,15 @@
 
 				if (realActivity || isSpotify) {
 					// Hay actividad real o Spotify
-					if (isSpotify && (!realActivity || realActivity.name === "Spotify")) {
+					if (
+						isSpotify &&
+						(!realActivity || realActivity.name === "Spotify")
+					) {
 						const spotify = data.data.spotify;
-						if (activityNameEl) activityNameEl.textContent = "Spotify";
-						if (activityDetailsEl) activityDetailsEl.textContent = `${spotify.song} - ${spotify.artist}`;
+						if (activityNameEl)
+							activityNameEl.textContent = "Spotify";
+						if (activityDetailsEl)
+							activityDetailsEl.textContent = `${spotify.song} - ${spotify.artist}`;
 
 						if (spotify.album_art_url) {
 							if (activityIcon) {
@@ -112,19 +112,37 @@
 							}
 							if (techBox) {
 								techBox.style.display = "flex";
-								techBox.setAttribute("data-tooltip", spotify.album);
+								techBox.setAttribute(
+									"data-tooltip",
+									spotify.album,
+								);
 							}
 						} else {
 							if (techBox) techBox.style.display = "none";
 						}
 					} else if (realActivity) {
-						if (activityNameEl) activityNameEl.textContent = realActivity.name;
-						if (activityDetailsEl) activityDetailsEl.textContent = realActivity.details || realActivity.state || "";
+						if (activityNameEl)
+							activityNameEl.textContent = realActivity.name;
+						if (activityDetailsEl)
+							activityDetailsEl.textContent =
+								realActivity.details ||
+								realActivity.state ||
+								"";
 
-						if (realActivity.assets && realActivity.assets.large_image) {
+						if (
+							realActivity.assets &&
+							realActivity.assets.large_image
+						) {
 							let url = "";
-							if (realActivity.assets.large_image.startsWith("mp:")) {
-								url = realActivity.assets.large_image.replace("mp:", "https://media.discordapp.net/");
+							if (
+								realActivity.assets.large_image.startsWith(
+									"mp:",
+								)
+							) {
+								url = realActivity.assets.large_image.replace(
+									"mp:",
+									"https://media.discordapp.net/",
+								);
 							} else {
 								url = `https://cdn.discordapp.com/app-assets/${realActivity.application_id}/${realActivity.assets.large_image}.png`;
 							}
@@ -134,7 +152,10 @@
 							}
 							if (techBox) {
 								techBox.style.display = "flex";
-								techBox.setAttribute("data-tooltip", realActivity.name);
+								techBox.setAttribute(
+									"data-tooltip",
+									realActivity.name,
+								);
 							}
 						} else {
 							if (techBox) techBox.style.display = "none";
@@ -168,7 +189,7 @@
 <style is:global>
 	.card {
 		width: 100%;
-		max-width: 312px;
+		max-width: 350px;
 		background: rgba(255, 255, 255, 0.06);
 		backdrop-filter: blur(20px);
 		-webkit-backdrop-filter: blur(20px);
@@ -176,13 +197,14 @@
 		border-radius: 28px;
 		padding: 0.8rem 1rem;
 		display: flex;
+		flex-direction: row; /* Asegurar flujo horizontal */
 		align-items: center;
 		justify-content: space-between;
 		gap: 0.8rem;
 		position: relative;
 		transition: none;
 		min-height: 100px;
-		overflow: visible !important;
+		overflow: hidden;
 	}
 
 	.card:hover {
@@ -193,6 +215,7 @@
 		display: flex;
 		align-items: center;
 		gap: 0.85rem;
+		min-width: 0; /* Permitir que los hijos se encojan */
 	}
 
 	.info {
@@ -258,6 +281,11 @@
 		color: rgba(255, 255, 255, 0.35);
 		margin: 0;
 		line-height: 1.2;
+		display: -webkit-box;
+		-webkit-line-clamp: 2; /* Máximo 2 líneas */
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		width: 100%; /* Ocupar el espacio disponible */
 	}
 
 	.tech-box {
@@ -270,7 +298,7 @@
 		align-items: center;
 		border: 1px solid rgba(255, 255, 255, 0.05);
 		flex-shrink: 0;
-		overflow: visible !important;
+		overflow: hidden;
 		position: relative;
 	}
 

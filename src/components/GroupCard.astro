@@ -8,7 +8,7 @@
 			data-tooltip="Join our Community"
 		>
 			<img
-				src="luxury-pfp.png"
+				src="profile.png"
 				alt="Group"
 				class="group-avatar"
 			/>
@@ -40,7 +40,7 @@
 <style is:global>
 	.card {
 		width: 100%;
-		max-width: 312px;
+		max-width: 350px;
 		background: rgba(255, 255, 255, 0.06);
 		backdrop-filter: blur(20px);
 		-webkit-backdrop-filter: blur(20px);
@@ -48,13 +48,14 @@
 		border-radius: 28px;
 		padding: 0.8rem 1rem;
 		display: flex;
+		flex-direction: row; /* Asegurar flujo horizontal */
 		align-items: center;
 		justify-content: space-between;
 		gap: 0.8rem;
 		position: relative;
 		transition: none;
 		min-height: 100px;
-		overflow: visible !important;
+		overflow: hidden;
 	}
 
 	.card:hover {

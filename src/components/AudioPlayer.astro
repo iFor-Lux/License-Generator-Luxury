@@ -258,8 +258,12 @@
 		color: #ffffff;
 		font-size: 0.85rem;
 		font-weight: 600;
-		display: inline-block;
+		display: block !important;
 		font-family: system-ui, sans-serif;
+		white-space: nowrap !important;
+		overflow: hidden !important;
+		text-overflow: ellipsis !important;
+		max-width: 250px;
 	}
 
 	.master-controls-group {
