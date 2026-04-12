@@ -7,13 +7,22 @@ import Terminal from "../components/Terminal.astro";
 import Socials from "../components/Socials.astro";
 import Location from "../components/Location.astro";
 import AudioPlayer from "../components/AudioPlayer.astro";
+import Noise from "../components/Noise.jsx";
 ---
 
 <Layout>
 	<main>
 		<video autoplay loop muted playsinline class="bg-video">
-			<source src="https://r2.guns.lol/5a145775-fe79-497f-8dea-33a4f4902df0.mp4" type="video/mp4" />
+			<source src="https://images.guns.lol/31c0364b9e0a58a873bbe97f0378895eefe318fa/J96mcv.mp4" type="video/mp4" />
 		</video>
+		<Noise
+			client:load
+			patternSize={250}
+			patternScaleX={2}
+			patternScaleY={2}
+			patternRefreshInterval={2}
+			patternAlpha={15}
+		/>
 		<!-- Cuadro Único Maestro -->
 		<div class="premium-box master-container">
 			<!-- Fila de Perfil -->
