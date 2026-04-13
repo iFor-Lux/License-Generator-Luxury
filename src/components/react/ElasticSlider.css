@@ -1,0 +1,201 @@
+/* ElasticSlider.css - Luxury Terminal Adaptations */
+
+.slider-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.slider-wrapper {
+  display: flex;
+  width: 100%;
+  touch-action: none;
+  user-select: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.slider-root {
+  position: relative;
+  display: flex;
+  width: 100%;
+  flex-grow: 1;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  align-items: center;
+  padding: 0.75rem 0;
+}
+
+.slider-root:active {
+  cursor: grabbing;
+}
+
+.slider-track-wrapper {
+  display: flex;
+  flex-grow: 1;
+  border-radius: 9999px;
+  overflow: visible;
+}
+
+.slider-track {
+  position: relative;
+  height: 100%;
+  flex-grow: 1;
+  overflow: hidden;
+  border-radius: 9999px;
+  background-color: rgba(15, 15, 15, 0.9); /* Fondo mucho más oscuro y sólido para contraste total */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.slider-range {
+  position: absolute;
+  height: 100%;
+  background: #ffcc33 !important; /* Forzar color dorado */
+  border-radius: 9999px;
+  box-shadow: 0 0 20px rgba(255, 204, 51, 0.7);
+  z-index: 2;
+}
+
+/* Slider de Volumen: Blanco (progreso) y Plomo (disponible) */
+.slider-range.white {
+    background: #ffffff !important; /* Blanco Puro para el porcentaje actual */
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+}
+
+.volume-slider-compact .slider-track {
+    background-color: #444444 !important; /* Plomo más claro para mejor visibilidad */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.volume-slider-compact .slider-thumb {
+    display: none; /* Eliminamos el punto dorado en el volumen para que se vea solo el cambio de color */
+}
+
+.slider-thumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px;
+  height: 120%;
+  background: #ffcc33; /* Punto dorado para indicar posición exacta */
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(255, 204, 51, 0.8), 0 0 5px rgba(0,0,0,0.5);
+  z-index: 5;
+  pointer-events: none;
+}
+
+.volume-slider-compact .slider-track {
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.motion-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.2rem;
+  width: 20px;
+  height: 20px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8)); /* Sombra para visibilidad total */
+}
+
+.volume-slider-compact .slider-track {
+    background-color: rgba(0, 0, 0, 0.6); /* Más oscuro para volumen */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.volume-slider-compact .motion-icon {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.volume-slider-compact:hover .motion-icon {
+    color: #ffffff; /* Brilla al pasar el mouse */
+}
+
+.value-indicator {
+  display: none; /* Lo manejaremos fuera si es necesario, para el reproductor usamos los spans de tiempo */
+}
+
+/* Iconos de Motion */
+.motion-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.2rem;
+  width: 20px;
+  height: 20px;
+}
+
+.audio-master-card.playing .motion-icon {
+    color: #ffcc33;
+}
+
+/* Ajustes para el slider de volumen */
+.volume-slider-compact {
+    width: 130px !important;
+    margin-top: 10px;
+}
+
+.volume-slider-compact .slider-wrapper {
+    gap: 0.4rem;
+}
+
+.volume-slider-compact .motion-icon {
+    font-size: 0.9rem;
+    width: 14px;
+    height: 14px;
+}
+
+/* Etiquetas de tiempo debajo de la barra */
+.time-labels-bottom {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 6px;
+    padding: 0 2px;
+}
+
+.time-label {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.05em;
+}
+
+/* RESPONSIVO PARA MÓVILES */
+@media (max-width: 768px) {
+    .master-bottom {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 1.5rem !important;
+        padding-top: 10px;
+    }
+
+    .volume-slider-compact {
+        width: 100% !important; /* Volumen a todo lo ancho en móvil */
+        margin-top: 0.5rem;
+    }
+
+    .volume-section {
+        width: 100%;
+    }
+
+    .progress-section {
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .slider-wrapper {
+        gap: 0; /* Eliminamos el gap si no hay iconos */
+    }
+
+    .slider-container {
+        padding: 0;
+    }
+}
