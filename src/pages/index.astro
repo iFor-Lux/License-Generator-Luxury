@@ -8,10 +8,12 @@ import Socials from "../components/Socials.astro";
 import Location from "../components/Location.astro";
 import AudioPlayer from "../components/AudioPlayer.astro";
 import Noise from "../components/Noise.jsx";
+import SplashScreen from "../components/react/SplashScreen.jsx";
 ---
 
 <Layout>
 	<main>
+		<SplashScreen client:load />
 		<video autoplay loop muted playsinline class="bg-video">
 			<source src="https://images.guns.lol/31c0364b9e0a58a873bbe97f0378895eefe318fa/J96mcv.mp4" type="video/mp4" />
 		</video>
