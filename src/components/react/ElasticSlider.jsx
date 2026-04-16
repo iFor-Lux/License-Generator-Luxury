@@ -1,13 +1,9 @@
-import { animate, motion, useMotionValue, useMotionValueEvent, useTransform } from 'motion/react';
-import { useEffect, useRef, useState } from 'react';
+import { animate, motion, useMotionValue } from 'motion/react';
+import { useRef, useState, useCallback } from 'react';
 import './ElasticSlider.css';
 
 const MAX_OVERFLOW = 50;
 
-/**
- * ElasticSlider adaptado para el Luxury Audio Player
- * Elimina la dependencia de Chakra UI e integra callbacks para el reproductor.
- */
 export default function ElasticSlider({
   value: controlledValue,
   defaultValue = 0,
@@ -23,168 +19,127 @@ export default function ElasticSlider({
   onDragEnd = null,
   rangeClassName = ''
 }) {
-  const [internalValue, setInternalValue] = useState(defaultValue);
+  const [isDragging, setIsDragging] = useState(false);
+  const [localValue, setLocalValue] = useState(defaultValue);
   const sliderRef = useRef(null);
-  const [region, setRegion] = useState('middle');
-  const clientX = useMotionValue(0);
   const overflow = useMotionValue(0);
   const scale = useMotionValue(1);
+  
+  const isControlled = controlledValue !== undefined;
+  const currentValue = isControlled ? controlledValue : localValue;
 
-  // Sincronizar con valor controlado desde el padre (ej. currentTime)
-  useEffect(() => {
-    if (controlledValue !== undefined) {
-      setInternalValue(controlledValue);
-    }
-  }, [controlledValue]);
-
-  const currentValue = controlledValue !== undefined ? controlledValue : internalValue;
-
-  useMotionValueEvent(clientX, 'change', (latest) => {
-    if (sliderRef.current) {
-      const { left, right } = sliderRef.current.getBoundingClientRect();
-      let newValue;
-
-      if (latest < left) {
-        setRegion('left');
-        newValue = left - latest;
-      } else if (latest > right) {
-        setRegion('right');
-        newValue = latest - right;
-      } else {
-        setRegion('middle');
-        newValue = 0;
-      }
-
-      overflow.jump(decay(newValue, MAX_OVERFLOW));
-    }
-  });
-
-  const handlePointerMove = (e) => {
-    if (e.buttons > 0 && sliderRef.current) {
-      const { left, width } = sliderRef.current.getBoundingClientRect();
-      let newValue = startingValue + ((e.clientX - left) / width) * (maxValue - startingValue);
-
-      if (isStepped) {
-        newValue = Math.round(newValue / stepSize) * stepSize;
-      }
-
-      newValue = Math.min(Math.max(newValue, startingValue), maxValue);
-      
-      setInternalValue(newValue);
-      
-      if (onChange) {
-        onChange(newValue);
-      }
-      
-      clientX.jump(e.clientX);
-    }
+  const getPercentage = (val) => {
+    const range = maxValue - startingValue;
+    if (range === 0) return 0;
+    return ((val - startingValue) / range) * 100;
   };
+
+  const updateValue = useCallback((clientX) => {
+    if (!sliderRef.current) return;
+    
+    const rect = sliderRef.current.getBoundingClientRect();
+    const percentage = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    let newValue = startingValue + percentage * (maxValue - startingValue);
+    
+    if (isStepped) {
+      newValue = Math.round(newValue / stepSize) * stepSize;
+    }
+    
+    newValue = Math.max(startingValue, Math.min(maxValue, newValue));
+    
+    if (!isControlled) {
+      setLocalValue(newValue);
+    }
+    
+    if (onChange) {
+      onChange(newValue);
+    }
+  }, [isControlled, startingValue, maxValue, isStepped, stepSize, onChange]);
 
   const handlePointerDown = (e) => {
-    if (onDragStart) onDragStart();
-    handlePointerMove(e);
-    e.currentTarget.setPointerCapture(e.pointerId);
+    e.preventDefault();
+    setIsDragging(true);
+    
+    if (onDragStart) {
+      onDragStart();
+    }
+    
+    updateValue(e.clientX);
+    sliderRef.current?.setPointerCapture(e.pointerId);
   };
 
-  const handlePointerUp = () => {
-    if (onDragEnd) onDragEnd();
+  const handlePointerMove = (e) => {
+    if (!isDragging) return;
+    
+    updateValue(e.clientX);
+  };
+
+  const handlePointerUp = (e) => {
+    if (!isDragging) return;
+    
+    setIsDragging(false);
+    
+    if (onDragEnd) {
+      onDragEnd(currentValue);
+    }
+    
     animate(overflow, 0, { type: 'spring', bounce: 0.5 });
   };
 
-  const getRangePercentage = () => {
-    const totalRange = maxValue - startingValue;
-    if (totalRange === 0) return 0;
-    return ((currentValue - startingValue) / totalRange) * 100;
+  const handleMouseLeave = (e) => {
+    if (isDragging) {
+      handlePointerUp(e);
+    }
   };
 
   return (
     <div className={`slider-container ${className}`}>
       <motion.div
-        onHoverStart={() => animate(scale, 1.15)}
-        onHoverEnd={() => animate(scale, 1)}
-        onTouchStart={() => animate(scale, 1.15)}
-        onTouchEnd={() => animate(scale, 1)}
+        onHoverStart={() => !isDragging && animate(scale, 1.15, { duration: 0.2 })}
+        onHoverEnd={() => !isDragging && animate(scale, 1, { duration: 0.2 })}
         style={{
           scale,
-          opacity: useTransform(scale, [1, 1.15], [0.8, 1])
+          opacity: 0.8 + scale.get() * 0.2
         }}
         className="slider-wrapper"
       >
-        <motion.div
-          className="motion-icon"
-          animate={{
-            scale: region === 'left' ? [1, 1.3, 1] : 1,
-            transition: { duration: 0.25 }
-          }}
-          style={{
-            x: useTransform(() => (region === 'left' ? -overflow.get() / scale.get() : 0))
-          }}
-        >
+        <div className="motion-icon" style={{ minWidth: '20px' }}>
           {leftIcon}
-        </motion.div>
+        </div>
 
         <div
           ref={sliderRef}
           className="slider-root"
-          onPointerMove={handlePointerMove}
           onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
+          onPointerLeave={handleMouseLeave}
         >
           <motion.div
             style={{
-              scaleX: useTransform(() => {
-                if (sliderRef.current) {
-                  const { width } = sliderRef.current.getBoundingClientRect();
-                  return 1 + overflow.get() / width;
-                }
-                return 1;
-              }),
-              scaleY: useTransform(overflow, [0, MAX_OVERFLOW], [1, 0.8]),
-              transformOrigin: useTransform(() => {
-                if (sliderRef.current) {
-                  const { left, width } = sliderRef.current.getBoundingClientRect();
-                  return clientX.get() < left + width / 2 ? 'right' : 'left';
-                }
-                return 'center';
-              }),
-              height: useTransform(scale, [1, 1.15], [5, 8]), // Grosor aumentado: 5px base, 8px hover
+              height: 5 + (scale.get() - 1) * 15,
+              scaleX: 1 + overflow.get() / 100,
+              scaleY: 1 - (overflow.get() / MAX_OVERFLOW) * 0.2,
             }}
             className="slider-track-wrapper"
           >
             <div className="slider-track">
               <div 
                 className={`slider-range ${rangeClassName}`} 
-                style={{ width: `${getRangePercentage()}%` }} 
+                style={{ width: `${getPercentage(currentValue)}%` }} 
               />
-              {/* Nuevo Thumb indicador */}
               <div 
                 className="slider-thumb"
-                style={{ left: `${getRangePercentage()}%` }}
+                style={{ left: `${getPercentage(currentValue)}%` }}
               />
             </div>
           </motion.div>
         </div>
 
-        <motion.div
-          className="motion-icon"
-          animate={{
-            scale: region === 'right' ? [1, 1.3, 1] : 1,
-            transition: { duration: 0.25 }
-          }}
-          style={{
-            x: useTransform(() => (region === 'right' ? overflow.get() / scale.get() : 0))
-          }}
-        >
+        <div className="motion-icon" style={{ minWidth: '20px' }}>
           {rightIcon}
-        </motion.div>
+        </div>
       </motion.div>
     </div>
   );
-}
-
-function decay(value, max) {
-  if (max === 0) return 0;
-  const entry = value / max;
-  const sigmoid = 2 * (1 / (1 + Math.exp(-entry)) - 0.5);
-  return sigmoid * max;
 }

@@ -37,25 +37,76 @@
 
 <script>
 	import "@m3e/web/shape";
-	import Typewriter from "typewriter-effect/dist/core";
 
-	// --- LOGICA DE TYPEWRITER ---
 	const typewriterElement = document.getElementById("typewriter");
 	if (typewriterElement) {
-		new Typewriter(typewriterElement, {
-			strings: [
-				"Luxury<span class='news-font'> Regedit</span>",
-				"Premium<span class='news-font'> Hax</span>",
-				"Always<span class='news-font'> Quality</span>",
-				"Best<span class='news-font'> Price</span>",
-			],
-			autoStart: true,
-			loop: true,
-			delay: 45,
-			deleteSpeed: 30,
-			pauseFor: 1500,
-			cursor: "|",
-		});
+		const phrases = [
+			{ text: "Luxury", suffix: " Regedit" },
+			{ text: "Premium", suffix: " Hax" },
+			{ text: "Always", suffix: " Quality" },
+			{ text: "Best", suffix: " Price" },
+		];
+		let phraseIndex = 0;
+		let charIndex = 0;
+		let isDeleting = false;
+		let cursorVisible = true;
+		const baseSpeed = 50;
+		const deleteSpeed = 25;
+		const pauseDuration = 1800;
+
+		const cursor = document.createElement('span');
+		cursor.className = 'typewriter-cursor';
+		cursor.textContent = '|';
+		typewriterElement.after(cursor);
+
+		function blinkCursor() {
+			cursor.style.opacity = cursorVisible ? '0' : '1';
+			cursorVisible = !cursorVisible;
+		}
+		const cursorInterval = setInterval(blinkCursor, 500);
+
+		function type() {
+			const current = phrases[phraseIndex];
+			
+			if (isDeleting) {
+				typewriterElement.innerHTML = current.text.substring(0, charIndex) + '<span class="news-font">' + current.suffix + '</span>';
+				charIndex--;
+				
+				if (charIndex < 0) {
+					isDeleting = false;
+					phraseIndex = (phraseIndex + 1) % phrases.length;
+					setTimeout(type, 300);
+					return;
+				}
+			} else {
+				charIndex++;
+				typewriterElement.innerHTML = current.text.substring(0, charIndex) + '<span class="news-font">' + current.suffix + '</span>';
+				
+				if (charIndex === current.text.length) {
+					if (phraseIndex === phrases.length - 1 && !isDeleting) {
+						setTimeout(() => {
+							isDeleting = true;
+							setTimeout(type, deleteSpeed);
+						}, pauseDuration);
+						return;
+					}
+					setTimeout(() => {
+						isDeleting = true;
+						setTimeout(type, deleteSpeed);
+					}, pauseDuration);
+					return;
+				}
+			}
+			
+			setTimeout(type, isDeleting ? deleteSpeed : baseSpeed);
+		}
+		
+		type();
+
+		const cleanup = () => {
+			clearInterval(cursorInterval);
+		};
+		document.addEventListener('astro:before-swap', cleanup, { once: true });
 	}
 </script>
 
@@ -156,6 +207,11 @@
 		font-style: italic;
 		font-weight: 700;
 		margin-left: 0;
+	}
+
+	.typewriter-cursor {
+		color: rgba(255, 255, 255, 0.7);
+		animation: none;
 	}
 
 	@media (max-width: 650px) {

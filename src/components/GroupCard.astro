@@ -1,4 +1,5 @@
 ---
+import './Card.css';
 ---
 
 <div class="card group-card">
@@ -38,43 +39,6 @@
 </div>
 
 <style is:global>
-	.card {
-		width: 100%;
-		max-width: 350px;
-		background: rgba(255, 255, 255, 0.06);
-		backdrop-filter: blur(20px);
-		-webkit-backdrop-filter: blur(20px);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 28px;
-		padding: 0.8rem 1rem;
-		display: flex;
-		flex-direction: row; /* Asegurar flujo horizontal */
-		align-items: center;
-		justify-content: space-between;
-		gap: 0.8rem;
-		position: relative;
-		transition: none;
-		min-height: 100px;
-		overflow: hidden;
-	}
-
-	.card:hover {
-		z-index: 100;
-	}
-
-	.card-left {
-		display: flex;
-		align-items: center;
-		gap: 0.85rem;
-	}
-
-	.info {
-		display: flex;
-		flex-direction: column;
-		gap: 0.15rem;
-		min-width: 0;
-	}
-
 	.group-avatar-container {
 		width: 75px;
 		height: 75px;
@@ -132,12 +96,6 @@
 	.subs-count {
 		font-family: inherit;
 		font-size: 0.75rem;
-	}
-
-	@media (max-width: 650px) {
-		.card {
-			max-width: 100%;
-		}
 	}
 
 	@media (max-width: 480px) {

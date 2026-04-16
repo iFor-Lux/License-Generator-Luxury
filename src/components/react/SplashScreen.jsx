@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import Dither from './Dither';
 import './SplashScreen.css';
+
+const Dither = lazy(() => import('./Dither'));
 
 export default function SplashScreen() {
   const [isVisible, setIsVisible] = useState(true);
@@ -51,16 +52,18 @@ export default function SplashScreen() {
         >
           {/* Background Dither Effect */}
           <div style={{ width: '100%', height: '100vh', position: 'absolute', top: 0, left: 0, zIndex: 1 }}>
-            <Dither
-              waveColor={[0.5, 0.5, 0.5]}
-              disableAnimation={false}
-              enableMouseInteraction={true}
-              mouseRadius={0.15}
-              colorNum={4}
-              waveAmplitude={0.3}
-              waveFrequency={3}
-              waveSpeed={0.05}
-            />
+            <Suspense fallback={null}>
+              <Dither
+                waveColor={[0.5, 0.5, 0.5]}
+                disableAnimation={false}
+                enableMouseInteraction={true}
+                mouseRadius={0.15}
+                colorNum={4}
+                waveAmplitude={0.3}
+                waveFrequency={3}
+                waveSpeed={0.05}
+              />
+            </Suspense>
           </div>
           
           <motion.div 
@@ -72,19 +75,19 @@ export default function SplashScreen() {
             <div className="splash-logo-wrapper">
               <h1 className="splash-title">LUXURY</h1>
               <div className="splash-divider"></div>
-              <p className="splash-subtitle">TERMINAL EXPERIENCE</p>
+              <p className="splash-subtitle">DASHBOARD CLIENT</p>
             </div>
 
             <div className={`enter-prompt ${hasClicked ? 'clicked' : ''}`}>
               <span className="enter-text">
-                {hasClicked ? "ACCESS GRANTED" : "CLICK ANYWHERE TO ENTER"}
+                {hasClicked ? "ACCESO CONCEDIDO" : "CLICK PARA ENTRAR"}
               </span>
             </div>
           </motion.div>
 
           <div className="splash-footer">
             <div className="splash-footer-box">
-              <p className="version-text">v5.0.1 // HIGH FIDELITY SYSTEM</p>
+              <p className="version-text">v1.0.0  |  HIGH FIDELITY SYSTEM</p>
             </div>
           </div>
         </motion.div>

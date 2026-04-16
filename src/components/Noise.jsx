@@ -19,7 +19,7 @@ const Noise = ({
 
     let frame = 0;
     let animationId;
-    const canvasSize = 1024;
+    const canvasSize = 512;
 
     const resize = () => {
       if (!canvas) return;
@@ -50,7 +50,7 @@ const Noise = ({
         drawGrain();
       }
       frame++;
-      animationId = window.requestAnimationFrame(loop);
+      animationId = requestAnimationFrame(loop);
     };
 
     window.addEventListener('resize', resize);
@@ -59,9 +59,9 @@ const Noise = ({
 
     return () => {
       window.removeEventListener('resize', resize);
-      window.cancelAnimationFrame(animationId);
+      cancelAnimationFrame(animationId);
     };
-  }, [patternSize, patternScaleX, patternScaleY, patternRefreshInterval, patternAlpha]);
+  }, [patternRefreshInterval, patternAlpha]);
 
   return <canvas className="noise-overlay" ref={grainRef} style={{ imageRendering: 'pixelated' }} />;
 };

@@ -276,9 +276,9 @@ export default function Dither({
     <Canvas
       className="dither-container"
       camera={{ position: [0, 0, 6] }}
-      dpr={1}
+      dpr={[1, 1.5]}
       frameloop="always"
-      gl={{ antialias: true, preserveDrawingBuffer: true }}
+      gl={{ antialias: false, preserveDrawingBuffer: false, powerPreference: 'low-power' }}
     >
       <DitheredWaves
         waveSpeed={waveSpeed}

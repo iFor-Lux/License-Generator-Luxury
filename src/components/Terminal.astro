@@ -147,11 +147,27 @@
 
 	// --- FUNCIONES DE SEGURIDAD E IP ---
 
+	function sanitizeString(str) {
+		if (typeof str !== 'string') return '';
+		const div = document.createElement('div');
+		div.textContent = str;
+		return div.innerHTML;
+	}
+
+	function createSeparator() {
+		const sep = document.createElement('div');
+		sep.className = 'log-separator';
+		return sep;
+	}
+
 	async function getIPHash() {
 		try {
 			const res = await fetch("https://api.ipify.org?format=json");
+			if (!res.ok) return null;
 			const data = await res.json();
 			const ip = data.ip;
+			
+			if (!ip || typeof ip !== 'string') return null;
 			
 			const msgBuffer = new TextEncoder().encode(ip);
 			const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
@@ -159,7 +175,6 @@
 			const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 			return hashHex;
 		} catch (e) {
-			console.error("Error al obtener IP:", e);
 			return null;
 		}
 	}
@@ -180,7 +195,7 @@
 		genBtn.classList.add("is-generated", "is-activated");
 		genBtn.style.opacity = "1";
 		licenseOutput.style.display = "flex";
-		licenseCode.textContent = key;
+		licenseCode.textContent = sanitizeString(key);
 
 		const terminalFooter = genBtn.closest(".terminal-footer");
 		if (terminalFooter) terminalFooter.classList.add("is-finished");
@@ -203,9 +218,8 @@
 			minimalStatus.classList.add("is-timer");
 			const updateTimer = () => {
 				if (secondsLeft <= 0) {
-					localStorage.removeItem("luxury_license");
-					localStorage.removeItem("luxury_expiry");
-					location.reload(); // Recargar para permitir nueva generación
+					clearLicenseData();
+					location.reload();
 					return;
 				}
 				const h = Math.floor(secondsLeft / 3600);
@@ -213,7 +227,7 @@
 				const s = secondsLeft % 60;
 				const timerLabel = timerState.querySelector(".timer-label");
 				if (timerLabel) {
-					timerLabel.innerHTML = `RESET EN: <span class="status-timer">${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}</span>`;
+					timerLabel.textContent = `RESET EN: ${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
 				}
 			};
 
@@ -226,9 +240,30 @@
 		}
 	}
 
+	function validateLicenseData(data) {
+		if (!data || typeof data !== 'object') return false;
+		if (typeof data.key !== 'string' || !data.key) return false;
+		if (typeof data.expirationDate !== 'string') return false;
+		const expiryDate = new Date(data.expirationDate);
+		if (isNaN(expiryDate.getTime())) return false;
+		return true;
+	}
+
+	function clearLicenseData() {
+		localStorage.removeItem("luxury_license");
+		localStorage.removeItem("luxury_expiry");
+	}
+
+	function saveLicenseData(key, expiry) {
+		try {
+			localStorage.setItem("luxury_license", key);
+			localStorage.setItem("luxury_expiry", expiry);
+		} catch (e) {
+		}
+	}
+
 	async function restoreSession() {
 		try {
-			// 1. Prioridad: LocalStorage (más rápido)
 			const savedKey = localStorage.getItem("luxury_license");
 			const savedExpiry = localStorage.getItem("luxury_expiry");
 
@@ -245,17 +280,18 @@
 				}
 			}
 
-			// 2. Respaldo: Verificación por IP (Anti-Incógnito)
 			const ipHash = await getIPHash();
 			if (ipHash) {
 				const snapshot = await get(child(ref(database), `active_ips/${ipHash}`));
 				if (snapshot.exists()) {
 					const data = snapshot.val();
+					if (!validateLicenseData(data)) return;
+					
 					const expiryDate = new Date(data.expirationDate);
 					const diffSeconds = Math.floor((expiryDate.getTime() - Date.now()) / 1000);
 
 					if (diffSeconds > 0) {
-						terminalContent.innerHTML += `<div class="log-separator"></div>`;
+						terminalContent.appendChild(createSeparator());
 						await typeMultiColorLine(terminalContent, [
 							{ text: "[NETWORK] ", className: "p-blue" },
 							{ text: "Sesión activa detectada para esta red (Anti-Abuse)...", className: "p-gray" }
@@ -267,18 +303,13 @@
 						await new Promise(r => setTimeout(r, 800));
 						
 						setActivatedUI(data.key, diffSeconds);
-						
-						// Recuperar en localStorage por si acaso
-						localStorage.setItem("luxury_license", data.key);
-						localStorage.setItem("luxury_expiry", data.expirationDate);
+						saveLicenseData(data.key, data.expirationDate);
 						return;
 					}
 				}
 			}
 		} catch (e) {
-			console.warn("Fallo durante la restauración de sesión:", e);
 		} finally {
-			// Si llegamos aquí y no se ha generado nada, habilitamos el botón
 			if (!hasGenerated && genBtn) {
 				genBtn.disabled = false;
 				const btnText = genBtn.querySelector(".btn-text");
@@ -314,7 +345,7 @@
 			genBtn.style.opacity = "0.5";
 			licenseOutput.style.display = "none";
 
-			terminalContent.innerHTML += `<div class="log-separator"></div>`;
+			terminalContent.appendChild(createSeparator());
 
 			const steps = [
 				{
@@ -322,7 +353,7 @@
 					segments: [
 						{ text: "[INFO] ", className: "p-blue" },
 						{
-							text: "Conectando con nodo regional (México/LATAM)...",
+							text: "Conectando con nodo regional (Free Fire/GLOBAL)...",
 							className: "p-gray",
 						},
 					],
@@ -443,10 +474,9 @@
 				).join("");
 			const key = `LUXURY-${part()}-${part()}-${part()}`;
 
-			// Persistencia Real en Firebase
 			try {
 				const now = new Date();
-				const expiration = new Date(now.getTime() + 24 * 60 * 60 * 1000); // +24h
+				const expiration = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 				
 				const licenseData = {
 					key: key,
@@ -457,26 +487,18 @@
 					device: ""
 				};
 
-				// 1. Guardar licencia
 				await set(ref(database, 'licenses/' + key), licenseData);
 				
-				// 2. Guardar IP Hash (Anti-Incógnito)
 				const ipHash = await getIPHash();
 				if (ipHash) {
 					await set(ref(database, 'active_ips/' + ipHash), licenseData);
 				}
 
-				// 3. Guardar en Cache Local
-				localStorage.setItem("luxury_license", key);
-				localStorage.setItem("luxury_expiry", expiration.toISOString());
-
-				console.log("Licencia guardada en Firebase (DB, IP y Cache):", key);
+				saveLicenseData(key, expiration.toISOString());
 				
 				setActivatedUI(key, 24 * 60 * 60);
 
 			} catch (error) {
-				console.error("Error al guardar licencia:", error);
-				// Permitir reintento si falla Firebase
 				hasGenerated = false;
 				genBtn.disabled = false;
 				const btnText = genBtn.querySelector(".btn-text");
