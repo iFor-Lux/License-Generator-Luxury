@@ -7,6 +7,7 @@ const Dither = lazy(() => import('./Dither'));
 export default function SplashScreen() {
   const [isVisible, setIsVisible] = useState(true);
   const [hasClicked, setHasClicked] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   const handleEnter = () => {
     if (hasClicked) return;
@@ -25,6 +26,7 @@ export default function SplashScreen() {
   };
 
   useEffect(() => {
+    setIsMounted(true);
     // Bloquear scroll mientras está la intro
     document.body.style.overflow = 'hidden';
     
@@ -67,7 +69,7 @@ export default function SplashScreen() {
           <motion.div 
             className="splash-box"
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={isMounted ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
           >
             <div className="splash-logo-wrapper">
