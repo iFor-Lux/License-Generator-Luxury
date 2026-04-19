@@ -18,11 +18,9 @@ export default function SplashScreen() {
 
     setHasClicked(true);
     
-    // Respuesta inmediata al clic
+    // Redireccionar a /dashboard
     setTimeout(() => {
-      setIsVisible(false);
-      // Desbloquear scroll si estaba bloqueado
-      document.body.style.overflow = 'auto';
+      window.location.href = '/License-Generator-Luxury/licencia';
     }, 100);
   };
 
