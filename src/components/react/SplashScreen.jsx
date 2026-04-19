@@ -21,7 +21,7 @@ export default function SplashScreen() {
     
     // Redireccionar a /dashboard
     setTimeout(() => {
-      window.location.href = '/License-Generator-Luxury/licencia';
+      window.location.href = '/licencia';
     }, 100);
   };
 

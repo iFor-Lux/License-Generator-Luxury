@@ -3,8 +3,8 @@ import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 
 export default defineConfig({
-  site: 'https://iFor-Lux.github.io',
-  base: '/License-Generator-Luxury',
+  site: 'https://luxcuentas.shop',
+  base: '/',
   integrations: [react()],
   vite: {
     build: {
