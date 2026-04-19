@@ -9,20 +9,71 @@ export default function SplashScreen() {
   const [hasClicked, setHasClicked] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
-  const handleEnter = () => {
-    if (hasClicked) return;
+  const hash = async (message) => {
+    const msgBuffer = new TextEncoder().encode(message);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  };
+
+  const handleEnter = async (e) => {
+    // Si ya se hizo clic o el evento viene del panel de debug, no hacer nada
+    if (hasClicked || (e && e.target && e.target.closest('.debug-panel'))) return;
+    
+    setHasClicked(true);
     
     // Ejecutar desbloqueo de audio inmediatamente (Síncrono para móvil)
     if (window.luxuryUnlock) {
       window.luxuryUnlock();
     }
 
-    setHasClicked(true);
+    try {
+      // Generar token local firmado
+      const seed = Math.random().toString(36).substring(2);
+      const timestamp = Date.now();
+      const secret = "LUX_GATE_2026_MASTER";
+      const signature = await hash(seed + timestamp + secret);
+      
+      localStorage.setItem('luxury_gate', JSON.stringify({ seed, timestamp, signature }));
+    } catch (e) {
+      console.error("Error signing gate:", e);
+    }
     
     // Redireccionar a /dashboard
     setTimeout(() => {
+      window.location.href = 'https://cuty.io/LuxKey';
+    }, 1500); // Un pequeño delay para que vean el "ESPERE..."
+  };
+
+  const simulateGate = async (e, mode) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (hasClicked) return;
+    
+    setHasClicked(true);
+    localStorage.removeItem('luxury_gate');
+    
+    if (mode === 'none') {
       window.location.href = '/licencia';
-    }, 100);
+      return;
+    }
+
+    const seed = "debug-" + Math.random().toString(36).substring(2);
+    let timestamp = Date.now();
+    const secret = "LUX_GATE_2026_MASTER";
+
+    if (mode === 'fast') timestamp = Date.now() - 2000; // Simular que ya pasaron sólo 2s
+    if (mode === 'valid') timestamp = Date.now() - 25000; // Simular que ya pasaron 25s
+    if (mode === 'expired') timestamp = Date.now() - 700000; // Simular que ya pasaron 11m
+
+    const signature = await hash(seed + timestamp + secret);
+    localStorage.setItem('luxury_gate', JSON.stringify({ seed, timestamp, signature }));
+    
+    setTimeout(() => {
+      window.location.href = '/licencia';
+    }, 800);
   };
 
   useEffect(() => {
@@ -80,7 +131,7 @@ export default function SplashScreen() {
 
             <div className={`enter-prompt ${hasClicked ? 'clicked' : ''}`}>
               <span className="enter-text">
-                {hasClicked ? "ACCESO CONCEDIDO" : "CLICK PARA ENTRAR"}
+                {hasClicked ? "ESPERE..." : "CLICK PARA ENTRAR"}
               </span>
             </div>
           </motion.div>
@@ -89,6 +140,14 @@ export default function SplashScreen() {
             <div className="splash-footer-box">
               <p className="version-text">v1.0.0  |  HIGH FIDELITY SYSTEM</p>
             </div>
+          </div>
+
+          {/* SIMULATION PANEL (DEBUG) */}
+          <div className="debug-panel" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
+             <button onClick={(e) => simulateGate(e, 'none')}>SIN TOKEN</button>
+             <button onClick={(e) => simulateGate(e, 'fast')}>FAST (2s)</button>
+             <button onClick={(e) => simulateGate(e, 'valid')}>BIEN (25s)</button>
+             <button onClick={(e) => simulateGate(e, 'expired')}>EXPIRADO (11m)</button>
           </div>
         </motion.div>
       )}

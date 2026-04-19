@@ -319,8 +319,105 @@
 		}
 	}
 
+	// --- LÓGICA DE VALIDACIÓN ESTÉTICA (THE GATE) ---
+
+	async function getHash(message) {
+		const msgBuffer = new TextEncoder().encode(message);
+		const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+		const hashArray = Array.from(new Uint8Array(hashBuffer));
+		return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+	}
+
+	async function runSecurityCheck() {
+		if (!terminalContent) return false;
+
+		await typeMultiColorLine(terminalContent, [
+			{ text: "[SYSTEM] ", className: "p-blue" },
+			{ text: "Iniciando secuencia de validación (GATE-V1)...", className: "p-gray" }
+		]);
+		await new Promise(r => setTimeout(r, 600));
+
+		const gateDataRaw = localStorage.getItem("luxury_gate");
+		
+		if (!gateDataRaw) {
+			await typeMultiColorLine(terminalContent, [
+				{ text: "[ERROR] ", className: "p-red" },
+				{ text: "Security Token not found. Completa el acortador correctamente.", className: "p-white" }
+			]);
+			return false;
+		}
+
+		const { seed, timestamp, signature } = JSON.parse(gateDataRaw);
+		const secret = "LUX_GATE_2026_MASTER";
+		const expectedSignature = await getHash(seed + timestamp + secret);
+
+		await typeMultiColorLine(terminalContent, [
+			{ text: "[GATE] ", className: "p-yellow" },
+			{ text: "Firma detectada: ", className: "p-gray" },
+			{ text: signature.substring(0, 16) + "...", className: "p-purple" }
+		]);
+		await new Promise(r => setTimeout(r, 800));
+
+		if (signature !== expectedSignature) {
+			await typeMultiColorLine(terminalContent, [
+				{ text: "[CRITICAL] ", className: "p-red" },
+				{ text: "Firma inválida. Completa el acortador correctamente.", className: "p-white" }
+			]);
+			return false;
+		}
+
+		const now = Date.now();
+		const elapsedSeconds = Math.floor((now - timestamp) / 1000);
+
+		await typeMultiColorLine(terminalContent, [
+			{ text: "[GATE] ", className: "p-yellow" },
+			{ text: "Tiempo transcurrido: ", className: "p-gray" },
+			{ text: `${elapsedSeconds}s`, className: "p-blue" },
+			{ text: " (Analizando integridad...)", className: "p-gray" }
+		]);
+		await new Promise(r => setTimeout(r, 1000));
+
+		if (elapsedSeconds < 10) {
+			await typeMultiColorLine(terminalContent, [
+				{ text: "[ERROR] ", className: "p-red" },
+				{ text: "Completa el acortador correctamente.", className: "p-white" }
+			]);
+			return false;
+		}
+
+		if (elapsedSeconds > 600) {
+			await typeMultiColorLine(terminalContent, [
+				{ text: "[ERROR] ", className: "p-red" },
+				{ text: "Token expirado (10m limit). Vuelve al inicio.", className: "p-white" }
+			]);
+			return false;
+		}
+
+		await typeMultiColorLine(terminalContent, [
+			{ text: "✓ ", className: "p-success" },
+			{ text: "Validación completada. Acceso concedido.", className: "p-gray" }
+		]);
+		await new Promise(r => setTimeout(r, 500));
+		
+		return true;
+	}
+
 	// Ejecutar restauración al iniciar
-	restoreSession();
+	async function init() {
+		const isGateValid = await runSecurityCheck();
+		if (isGateValid) {
+			restoreSession();
+		} else {
+			if (genBtn) {
+				genBtn.disabled = true;
+				const btnText = genBtn.querySelector(".btn-text");
+				if (btnText) btnText.textContent = "ACCESO DENEGADO";
+				genBtn.style.opacity = "0.5";
+			}
+		}
+	}
+
+	init();
 
 	if (genBtn && terminalContent && licenseOutput) {
 		genBtn.addEventListener("click", async () => {

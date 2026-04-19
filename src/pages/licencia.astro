@@ -10,6 +10,13 @@ import AudioPlayer from "../components/AudioPlayer.astro";
 import Noise from "../components/Noise.jsx";
 ---
 
+<script is:inline>
+	// URL MASKING: Cambiar la URL visualmente a la raíz para evitar accesos directos
+	if (window.history.replaceState) {
+		window.history.replaceState({}, '', '/');
+	}
+</script>
+
 <Layout>
 	<main>
 		<video autoplay loop muted playsinline class="bg-video">
