@@ -1,11 +1,12 @@
 ---
+
 ---
 
 <div class="profile-row">
 	<div class="image-wrapper">
 		<m3e-shape name="7-sided-cookie" class="cookie-shape">
 			<img
-				src="profile.png"
+				src="https://i.pinimg.com/736x/d9/8d/1f/d98d1f29e7e43cd867aedb09295954b8.jpg"
 				alt="Profile"
 				class="profile-img"
 			/>
@@ -28,9 +29,9 @@
 			</div>
 		</h1>
 		<p class="description">
-			Somos @Luxuryregedit, una empresa con más de 5 años de
-			experiencia en el mercado siempre entregando el mejor
-			producto al menor precio posible.
+			Somos @Luxuryregedit, una empresa con más de 5 años de experiencia
+			en el mercado siempre entregando el mejor producto al menor precio
+			posible.
 		</p>
 	</div>
 </div>
@@ -54,24 +55,39 @@
 		const deleteSpeed = 25;
 		const pauseDuration = 1800;
 
-		const cursor = document.createElement('span');
-		cursor.className = 'typewriter-cursor';
-		cursor.textContent = '|';
+		const cursor = document.createElement("span");
+		cursor.className = "typewriter-cursor";
+		cursor.textContent = "|";
 		typewriterElement.after(cursor);
 
 		function blinkCursor() {
-			cursor.style.opacity = cursorVisible ? '0' : '1';
+			cursor.style.opacity = cursorVisible ? "0" : "1";
 			cursorVisible = !cursorVisible;
 		}
 		const cursorInterval = setInterval(blinkCursor, 500);
 
 		function type() {
 			const current = phrases[phraseIndex];
-			
+			const fullText = current.text + current.suffix;
+
 			if (isDeleting) {
-				typewriterElement.innerHTML = current.text.substring(0, charIndex) + '<span class="news-font">' + current.suffix + '</span>';
+				if (charIndex <= current.text.length) {
+					typewriterElement.innerHTML = current.text.substring(
+						0,
+						charIndex,
+					);
+				} else {
+					typewriterElement.innerHTML =
+						current.text +
+						'<span class="news-font">' +
+						current.suffix.substring(
+							0,
+							charIndex - current.text.length,
+						) +
+						"</span>";
+				}
 				charIndex--;
-				
+
 				if (charIndex < 0) {
 					isDeleting = false;
 					phraseIndex = (phraseIndex + 1) % phrases.length;
@@ -79,17 +95,24 @@
 					return;
 				}
 			} else {
+				if (charIndex <= current.text.length) {
+					typewriterElement.innerHTML = current.text.substring(
+						0,
+						charIndex,
+					);
+				} else {
+					typewriterElement.innerHTML =
+						current.text +
+						'<span class="news-font">' +
+						current.suffix.substring(
+							0,
+							charIndex - current.text.length,
+						) +
+						"</span>";
+				}
 				charIndex++;
-				typewriterElement.innerHTML = current.text.substring(0, charIndex) + '<span class="news-font">' + current.suffix + '</span>';
-				
-				if (charIndex === current.text.length) {
-					if (phraseIndex === phrases.length - 1 && !isDeleting) {
-						setTimeout(() => {
-							isDeleting = true;
-							setTimeout(type, deleteSpeed);
-						}, pauseDuration);
-						return;
-					}
+
+				if (charIndex > fullText.length) {
 					setTimeout(() => {
 						isDeleting = true;
 						setTimeout(type, deleteSpeed);
@@ -97,16 +120,16 @@
 					return;
 				}
 			}
-			
+
 			setTimeout(type, isDeleting ? deleteSpeed : baseSpeed);
 		}
-		
+
 		type();
 
 		const cleanup = () => {
 			clearInterval(cursorInterval);
 		};
-		document.addEventListener('astro:before-swap', cleanup, { once: true });
+		document.addEventListener("astro:before-swap", cleanup, { once: true });
 	}
 </script>
 
@@ -131,6 +154,8 @@
 		display: block;
 		overflow: hidden;
 		--m3e-shape-color: transparent;
+		filter: drop-shadow(0 0 0.5px rgba(255, 204, 51, 0.8))
+			drop-shadow(0 0 0.5px rgba(255, 204, 51, 0.2));
 	}
 
 	.profile-img {

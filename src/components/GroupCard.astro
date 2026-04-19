@@ -1,18 +1,11 @@
 ---
-import './Card.css';
+import "./Card.css";
 ---
 
 <div class="card group-card">
 	<div class="card-left">
-		<div
-			class="group-avatar-container"
-			data-tooltip="Join our Community"
-		>
-			<img
-				src="profile.png"
-				alt="Group"
-				class="group-avatar"
-			/>
+		<div class="group-avatar-container" data-tooltip="Join our Community">
+			<img src="profile.png" alt="Group" class="group-avatar" />
 		</div>
 		<div class="info">
 			<span class="group-name">Luxury Clientes</span>
@@ -23,13 +16,10 @@ import './Card.css';
 					stroke="currentColor"
 					stroke-width="2"
 					class="users-icon"
-					><path
-						d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
-					></path><circle cx="9" cy="7" r="4"
-					></circle><path
-						d="M23 21v-2a4 4 0 0 0-3-3.87"
-					></path><path d="M16 3.13a4 4 0 0 1 0 7.75"
-					></path></svg
+					><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
+					></path><circle cx="9" cy="7" r="4"></circle><path
+						d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path
+						d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg
 				>
 				<span class="subs-count">7,321 Clientes</span>
 			</div>
@@ -43,7 +33,7 @@ import './Card.css';
 		width: 75px;
 		height: 75px;
 		border-radius: 12px;
-		overflow: hidden;
+		overflow: visible;
 		flex-shrink: 0;
 		border: 1px solid rgba(255, 255, 255, 0.1);
 	}
@@ -52,6 +42,7 @@ import './Card.css';
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+		border-radius: 12px;
 	}
 
 	.join-pill {

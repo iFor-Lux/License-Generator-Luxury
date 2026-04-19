@@ -15,7 +15,7 @@
 	position: relative;
 	transition: none;
 	min-height: 100px;
-	overflow: hidden;
+	overflow: visible;
 }
 
 .card:hover {
