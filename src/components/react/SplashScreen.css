@@ -150,36 +150,33 @@
   }
 }
 
-/* DEBUG PANEL STYLES */
-.debug-panel {
+/* MASTER ACCESS FIELD (BACKDOOR) */
+.master-field {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  z-index: 10000;
-  opacity: 0.3;
-  transition: opacity 0.3s ease;
-}
-
-.debug-panel:hover {
-  opacity: 1;
-}
-
-.debug-panel button {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  padding: 5px 10px;
-  font-size: 10px;
-  border-radius: 4px;
-  cursor: pointer;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+  width: 50px;
+  padding: 4px 8px;
+  font-size: 11px;
+  text-align: center;
   font-family: 'JetBrains Mono', monospace;
-  transition: all 0.2s ease;
+  outline: none;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 6px;
+  z-index: 1000;
 }
 
-.debug-panel button:hover {
-  background: white;
-  color: black;
+.master-field:focus {
+  border-color: rgba(255, 204, 51, 0.4);
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffcc33;
+  width: 70px;
+  box-shadow: 0 0 20px rgba(255, 204, 51, 0.1);
+}
+
+.master-field::placeholder {
+  color: rgba(255, 255, 255, 0.3);
 }

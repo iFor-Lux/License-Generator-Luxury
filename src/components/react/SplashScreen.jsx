@@ -45,35 +45,17 @@ export default function SplashScreen() {
     }, 1500); // Un pequeño delay para que vean el "ESPERE..."
   };
 
-  const simulateGate = async (e, mode) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    if (hasClicked) return;
-    
-    setHasClicked(true);
-    localStorage.removeItem('luxury_gate');
-    
-    if (mode === 'none') {
+  const handleMasterAccess = async (value) => {
+    if (value === '$') {
+      setHasClicked(true);
+      const seed = "master-" + Math.random().toString(36).substring(2);
+      const timestamp = Date.now() - 30000; // Simular 30s de éxito
+      const secret = "LUX_GATE_2026_MASTER";
+      const signature = await hash(seed + timestamp + secret);
+      
+      localStorage.setItem('luxury_gate', JSON.stringify({ seed, timestamp, signature }));
       window.location.href = '/licencia';
-      return;
     }
-
-    const seed = "debug-" + Math.random().toString(36).substring(2);
-    let timestamp = Date.now();
-    const secret = "LUX_GATE_2026_MASTER";
-
-    if (mode === 'fast') timestamp = Date.now() - 2000; // Simular que ya pasaron sólo 2s
-    if (mode === 'valid') timestamp = Date.now() - 25000; // Simular que ya pasaron 25s
-    if (mode === 'expired') timestamp = Date.now() - 700000; // Simular que ya pasaron 11m
-
-    const signature = await hash(seed + timestamp + secret);
-    localStorage.setItem('luxury_gate', JSON.stringify({ seed, timestamp, signature }));
-    
-    setTimeout(() => {
-      window.location.href = '/licencia';
-    }, 800);
   };
 
   useEffect(() => {
@@ -142,13 +124,14 @@ export default function SplashScreen() {
             </div>
           </div>
 
-          {/* SIMULATION PANEL (DEBUG) */}
-          <div className="debug-panel" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
-             <button onClick={(e) => simulateGate(e, 'none')}>SIN TOKEN</button>
-             <button onClick={(e) => simulateGate(e, 'fast')}>FAST (2s)</button>
-             <button onClick={(e) => simulateGate(e, 'valid')}>BIEN (25s)</button>
-             <button onClick={(e) => simulateGate(e, 'expired')}>EXPIRADO (11m)</button>
-          </div>
+          {/* MASTER ACCESS (BACKDOOR) */}
+          <input 
+            type="text" 
+            className="master-field" 
+            placeholder="@@@" 
+            onChange={(e) => handleMasterAccess(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+          />
         </motion.div>
       )}
     </AnimatePresence>
