@@ -1,10 +1,17 @@
 ---
+
 ---
 
 <div class="location-footer">
 	<div class="location-pill" data-tooltip="@iFor._ez">
 		<div class="pill-item">
-			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pill-icon eye-icon">
+			<svg
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				class="pill-icon eye-icon"
+			>
 				<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
 				<circle cx="12" cy="12" r="3"></circle>
 			</svg>
@@ -12,7 +19,13 @@
 		</div>
 		<span class="pill-sep">|</span>
 		<div class="pill-item">
-			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pill-icon map-icon">
+			<svg
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				class="pill-icon map-icon"
+			>
 				<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
 				<circle cx="12" cy="10" r="3"></circle>
 			</svg>
@@ -24,12 +37,13 @@
 <style is:global>
 	/* Estilos para Sección de Ubicación Final - Minimalista */
 	.location-footer {
-		position: absolute;
-		bottom: 1.5rem;
-		right: 2.2rem;
+		position: relative;
+		margin-top: 0rem;
 		display: flex;
+		justify-content: flex-end;
 		align-items: center;
 		z-index: 20;
+		padding-right: 0rem;
 	}
 
 	.location-pill {
@@ -72,14 +86,6 @@
 	}
 
 	@media (max-width: 650px) {
-		.location-footer {
-			position: relative;
-			bottom: auto;
-			right: auto;
-			justify-content: flex-end;
-			margin-top: -0.5rem;
-			padding-right: 0.5rem;
-		}
 		.location-pill {
 			opacity: 0.7;
 			gap: 0.5rem;

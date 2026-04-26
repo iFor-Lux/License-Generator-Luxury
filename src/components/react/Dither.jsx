@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unknown-property */
-import { useRef, useEffect, forwardRef } from 'react';
+import { useRef, useEffect, forwardRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { EffectComposer, wrapEffect } from '@react-three/postprocessing';
 import { Effect } from 'postprocessing';
@@ -272,6 +272,17 @@ export default function Dither({
   enableMouseInteraction = true,
   mouseRadius = 1
 }) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   return (
     <Canvas
       className="dither-container"
@@ -288,7 +299,7 @@ export default function Dither({
         colorNum={colorNum}
         pixelSize={pixelSize}
         disableAnimation={disableAnimation}
-        enableMouseInteraction={enableMouseInteraction}
+        enableMouseInteraction={enableMouseInteraction && !isMobile}
         mouseRadius={mouseRadius}
       />
     </Canvas>

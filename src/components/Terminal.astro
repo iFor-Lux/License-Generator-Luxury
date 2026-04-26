@@ -160,9 +160,9 @@
 		return sep;
 	}
 
-	async function getIPHash() {
+	async function getIPData() {
 		try {
-			const res = await fetch("https://api.ipify.org?format=json");
+			const res = await fetch("https://get.geojs.io/v1/ip/geo.json");
 			if (!res.ok) return null;
 			const data = await res.json();
 			const ip = data.ip;
@@ -173,7 +173,11 @@
 			const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
 			const hashArray = Array.from(new Uint8Array(hashBuffer));
 			const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-			return hashHex;
+			return {
+				hash: hashHex.substring(0, 10),
+				ip: ip,
+				country: data.country || "Unknown"
+			};
 		} catch (e) {
 			return null;
 		}
@@ -280,9 +284,9 @@
 				}
 			}
 
-			const ipHash = await getIPHash();
-			if (ipHash) {
-				const snapshot = await get(child(ref(database), `active_ips/${ipHash}`));
+			const ipData = await getIPData();
+			if (ipData) {
+				const snapshot = await get(child(ref(database), `active_ips/${ipData.hash}`));
 				if (snapshot.exists()) {
 					const data = snapshot.val();
 					if (!validateLicenseData(data)) return;
@@ -556,6 +560,16 @@
 						},
 					],
 				},
+				{
+					type: "multi",
+					segments: [
+						{ text: "[INFO] ", className: "p-blue" },
+						{
+							text: "Presiona el ícono de copiar para guardar tu licencia.",
+							className: "p-yellow",
+						},
+					],
+				},
 			];
 
 			for (const step of steps) {
@@ -581,14 +595,18 @@
 					expirationDate: expiration.toISOString(),
 					status: "active",
 					used: false,
-					device: ""
+					device: "",
+					tier: "free"
 				};
 
-				await set(ref(database, 'licenses/' + key), licenseData);
-				
-				const ipHash = await getIPHash();
-				if (ipHash) {
-					await set(ref(database, 'active_ips/' + ipHash), licenseData);
+				const ipData = await getIPData();
+				if (ipData) {
+					licenseData.ip = ipData.ip;
+					licenseData.country = ipData.country;
+					await set(ref(database, 'licenses/' + key), licenseData);
+					await set(ref(database, 'active_ips/' + ipData.hash), licenseData);
+				} else {
+					await set(ref(database, 'licenses/' + key), licenseData);
 				}
 
 				saveLicenseData(key, expiration.toISOString());
