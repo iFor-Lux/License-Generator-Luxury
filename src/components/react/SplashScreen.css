@@ -280,7 +280,13 @@ spline-viewer {
 
 @media (max-width: 768px) {
   .splash-overlay {
-    height: 100dvh;
+    height: 100dvh !important;
+    overflow: hidden !important;
+    touch-action: none !important;
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100vw;
     background: #ffffff url('/mobile.png') no-repeat center center !important;
     background-size: cover !important;
     justify-content: space-evenly;
