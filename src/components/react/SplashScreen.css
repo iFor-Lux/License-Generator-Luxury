@@ -1,154 +1,79 @@
+@font-face {
+  font-family: "SF Regular";
+  src: url("https://raw.githubusercontent.com/iFor-Lux/pagina-store-luxury/main/public/font/SF-Pro-Display-Regular.woff2") format("woff2");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Instrument Serif";
+  src: url("https://raw.githubusercontent.com/iFor-Lux/pagina-store-luxury/main/public/font/InstrumentSerif-Italic.woff2") format("woff2");
+  font-style: italic;
+  font-display: block;
+}
+
+
 .splash-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: #050505;
+  background: #ffffff;
   z-index: 9999;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  cursor: pointer;
+  padding-top: 4rem;
   overflow: hidden;
   user-select: none;
 }
 
-.splash-dither-bg {
+spline-viewer {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  z-index: 0;
+  pointer-events: auto;
+}
+
+.splash-overlay::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  box-shadow: inset 0 0 80px 10px #FFFFFF;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.splash-white-mask {
+  position: absolute;
+  top: -35%;
+  left: -2%;
+  right: -2%;
+  height: 90%;
+  background: #ffffffc2;
+  border-radius: 0 0 50% 50%;
   z-index: 1;
   pointer-events: none;
-  opacity: 0.8;
+  filter: blur(100px);
+  box-shadow: 0 10px 40px rgba(255, 255, 255, 0.8);
 }
 
-.splash-box {
+.splash-new-box,
+.splash-giant-title,
+.splash-subtitle,
+.splash-description {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.2rem;
-  z-index: 2;
-  padding: 1.8rem 3rem;
-  background: rgba(5, 5, 5, 0.2);
-  backdrop-filter: blur(30px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
-  box-shadow: 
-    0 40px 120px rgba(0, 0, 0, 0.8),
-    inset 0 0 80px rgba(255, 255, 255, 0.02);
-  max-width: 500px;
-  width: 85%;
-  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.splash-logo-wrapper {
-  text-align: center;
-}
-
-.splash-title {
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 2.5rem;
-  font-weight: 900;
-  letter-spacing: 1rem;
-  margin: 0;
-  padding-left: 1rem;
-  background: linear-gradient(to bottom, #ffffff 0%, #a0a0a0 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.15));
-}
-
-.splash-divider {
-  width: 60px;
-  height: 1px;
-  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
-  margin: 0.8rem auto;
-}
-
-.splash-subtitle {
-  font-size: 0.7rem;
-  letter-spacing: 0.35rem;
-  color: rgba(212, 175, 55, 0.6);
-  font-weight: 300;
-  margin: 0;
-}
-
-.enter-prompt {
-  margin-top: 1.5rem;
-  padding: 0.5rem 1.5rem;
-  border-radius: 100px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.enter-prompt.clicked {
-  transform: scale(0.95);
-  background: rgba(255, 215, 0, 0.1);
-  border-color: rgba(255, 215, 0, 0.2);
-}
-
-.enter-text {
-  font-size: 0.75rem;
-  letter-spacing: 0.2rem;
-  color: rgba(255, 255, 255, 0.6);
-  font-weight: 500;
-}
-
-.splash-footer {
-  position: absolute;
-  bottom: 2.5rem;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: center;
   z-index: 2;
 }
 
-.splash-footer-box {
-  padding: 0.8rem 2rem;
-  background: rgba(5, 5, 5, 0.4);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 100px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-}
 
-.version-text {
-  font-size: 0.65rem;
-  letter-spacing: 0.3rem;
-  color: rgba(255, 255, 255, 0.3);
-  font-family: 'JetBrains Mono', monospace;
-  margin: 0;
-}
-
-@media (max-width: 768px) {
-  .splash-box {
-    padding: 1.2rem 1.5rem;
-    gap: 0.8rem;
-    border-radius: 16px;
-    width: 80%;
-  }
-  .splash-title {
-    font-size: 1.8rem;
-    letter-spacing: 0.6rem;
-    padding-left: 0.6rem;
-  }
-  .splash-subtitle {
-    font-size: 0.6rem;
-    letter-spacing: 0.25rem;
-  }
-  .enter-prompt {
-    margin-top: 1rem;
-    padding: 0.4rem 1.2rem;
-  }
-}
 
 /* MASTER ACCESS FIELD (BACKDOOR) */
 .master-field {
@@ -162,7 +87,6 @@
   padding: 4px 8px;
   font-size: 11px;
   text-align: center;
-  font-family: 'JetBrains Mono', monospace;
   outline: none;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   border-radius: 6px;
@@ -179,4 +103,285 @@
 
 .master-field::placeholder {
   color: rgba(255, 255, 255, 0.3);
+}
+
+.splash-new-box {
+  width: fit-content;
+  padding: 6px 20px;
+  height: auto;
+  background-color: #cfcfcf;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+}
+
+.splash-box-text {
+  font-family: "SF Regular", sans-serif;
+  color: #414141;
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: 0.02rem;
+}
+
+.splash-title-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0rem;
+  margin-top: 1.5rem;
+  z-index: 2;
+}
+
+.splash-giant-title {
+  font-size: 12rem;
+  margin-top: 0;
+  margin-bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.luxury-text {
+  font-family: "SF Regular", sans-serif;
+  color: #363C48;
+}
+
+.regedit-text {
+  font-family: "Instrument Serif", serif;
+  font-weight: 400;
+  font-style: italic;
+  color: #006FFF;
+}
+
+.splash-subtitle {
+  font-size: 8rem;
+  margin-top: -2rem;
+  margin-bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.dashboard-text {
+  font-family: "Instrument Serif", serif;
+  font-weight: 400;
+  font-style: italic;
+  color: #006FFF;
+}
+
+.client-text {
+  font-family: "SF Regular", sans-serif;
+  color: #363C48;
+}
+
+.splash-description {
+  font-family: "SF Regular", sans-serif;
+  color: #000000;
+  font-size: 24px;
+  margin-top: 1.5rem;
+  text-align: center;
+  max-width: 600px;
+  line-height: 1.4;
+}
+
+.splash-buttons-container {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+  width: 100%;
+  padding: 0 2rem;
+  align-items: center;
+}
+
+.splash-button {
+  font-family: "SF Regular", sans-serif;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #FFF5E3;
+  font-size: 1.1rem;
+  font-weight: 500;
+  padding: 16px 0;
+  width: 85%;
+  max-width: 320px;
+  border-radius: 50px;
+  cursor: pointer;
+  text-align: center;
+  transition: none !important;
+  transform: none !important;
+  animation: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  outline: none !important;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.splash-button .button-text {
+  position: relative;
+  z-index: 2;
+}
+
+@media (min-width: 769px) {
+  .splash-buttons-container {
+    flex-direction: row;
+    gap: 3rem;
+    margin-top: 5rem;
+    width: auto;
+    padding: 0;
+  }
+
+  .splash-button {
+    width: auto;
+    max-width: none;
+    padding: 14px 42px;
+    font-size: 1.2rem;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .splash-button::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+    display: block !important;
+  }
+
+  .splash-button:hover::after {
+    transform: translateX(100%);
+  }
+
+  .splash-button:hover {
+    transform: translateY(-4px) scale(1.02) !important;
+    background: rgba(0, 0, 0, 0.95) !important;
+    border-color: rgba(0, 111, 255, 0.5) !important;
+    box-shadow: 0 20px 40px rgba(0, 111, 255, 0.25) !important;
+  }
+}
+
+
+
+@media (max-width: 768px) {
+  .splash-overlay {
+    height: 100dvh;
+    background: #ffffff url('/mobile.png') no-repeat center center !important;
+    background-size: cover !important;
+    justify-content: space-evenly;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+
+  spline-viewer {
+    display: none !important;
+  }
+
+  .splash-white-mask {
+    top: -20%;
+    left: -15%;
+    right: -15%;
+    height: 70%;
+    border-radius: 0 0 50% 50%;
+    background: rgba(255, 255, 255, 0.88);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .splash-white-mask {
+      background: #020202fa !important;
+    }
+  }
+
+  .splash-new-box {
+    width: fit-content;
+    padding: 4px 16px;
+    height: auto;
+  }
+
+  .splash-box-text {
+    font-size: 0.8rem;
+  }
+
+  .splash-giant-title {
+    font-size: 3.5rem;
+    padding: 0 2rem;
+    box-sizing: border-box;
+    margin-top: 0;
+  }
+
+  .splash-subtitle {
+    font-size: 2rem;
+    margin-top: -0.5rem;
+  }
+
+  .splash-description {
+    font-size: 12.5px;
+    margin-top: 1rem;
+    padding: 0;
+    max-width: 75%;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.4;
+  }
+
+
+}
+
+@media (prefers-color-scheme: dark) {
+  .splash-overlay {
+    background: #050505;
+  }
+
+  .splash-overlay::after {
+    box-shadow: inset 0 0 60px 40px #050505;
+  }
+
+  .splash-white-mask {
+    background: #050505ee;
+  }
+
+  .luxury-text,
+  .client-text,
+  .splash-description {
+    color: #FFF5E3;
+  }
+
+  .splash-new-box {
+    background-color: #373737;
+  }
+
+  .splash-box-text {
+    color: #FFF5E3;
+  }
+
+  .splash-button {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+  }
+
+  .splash-button:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(0, 111, 255, 0.6);
+    color: #ffffff;
+    box-shadow: 0 20px 40px rgba(0, 111, 255, 0.3);
+  }
+
 }

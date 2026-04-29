@@ -1,8 +1,6 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import './SplashScreen.css';
-
-const Dither = lazy(() => import('./Dither'));
 
 export default function SplashScreen() {
   const [isVisible, setIsVisible] = useState(true);
@@ -16,34 +14,26 @@ export default function SplashScreen() {
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   };
 
-  const handleEnter = async (e) => {
-    // Si ya se hizo clic o el evento viene del panel de debug, no hacer nada
-    if (hasClicked || (e && e.target && e.target.closest('.debug-panel'))) return;
-    
-    setHasClicked(true);
-    
-    // Ejecutar desbloqueo de audio inmediatamente (Síncrono para móvil)
-    if (window.luxuryUnlock) {
-      window.luxuryUnlock();
-    }
+  useEffect(() => {
+    const splineViewer = document.querySelector('spline-viewer');
+    if (splineViewer) {
+      const checkShadow = setInterval(() => {
+        if (splineViewer.shadowRoot) {
+          const logo = splineViewer.shadowRoot.querySelector('#logo') ||
+            splineViewer.shadowRoot.querySelector('a[href*="spline"]');
+          if (logo) {
+            logo.style.display = 'none';
+            logo.style.opacity = '0';
+            logo.style.visibility = 'hidden';
+            logo.style.pointerEvents = 'none';
+            clearInterval(checkShadow);
+          }
+        }
+      }, 100);
 
-    try {
-      // Generar token local firmado
-      const seed = Math.random().toString(36).substring(2);
-      const timestamp = Date.now();
-      const secret = "LUX_GATE_2026_MASTER";
-      const signature = await hash(seed + timestamp + secret);
-      
-      localStorage.setItem('luxury_gate', JSON.stringify({ seed, timestamp, signature }));
-    } catch (e) {
-      console.error("Error signing gate:", e);
+      setTimeout(() => clearInterval(checkShadow), 10000);
     }
-    
-    // Redireccionar a /dashboard
-    setTimeout(() => {
-      window.location.href = 'https://cuty.io/LuxKey';
-    }, 1500); // Un pequeño delay para que vean el "ESPERE..."
-  };
+  }, []);
 
   const handleMasterAccess = async (value) => {
     if (value === '$') {
@@ -52,17 +42,29 @@ export default function SplashScreen() {
       const timestamp = Date.now() - 30000; // Simular 30s de éxito
       const secret = "LUX_GATE_2026_MASTER";
       const signature = await hash(seed + timestamp + secret);
-      
+
       localStorage.setItem('luxury_gate', JSON.stringify({ seed, timestamp, signature }));
       window.location.href = '/licencia';
     }
   };
 
+  const handleGenerateLicense = async () => {
+    const seed = "gate-" + Math.random().toString(36).substring(2);
+    const timestamp = Date.now(); // Tiempo real
+    const secret = "LUX_GATE_2026_MASTER";
+    const signature = await hash(seed + timestamp + secret);
+
+    localStorage.setItem('luxury_gate', JSON.stringify({ seed, timestamp, signature }));
+    
+    window.open('https://cuty.io/LuxKey', '_blank');
+  };
+
+
   useEffect(() => {
     setIsMounted(true);
     // Bloquear scroll mientras está la intro
     document.body.style.overflow = 'hidden';
-    
+
     // Auto-enter opcional o precarga de recursos
     return () => {
       document.body.style.overflow = 'auto';
@@ -72,63 +74,49 @@ export default function SplashScreen() {
   return (
     <AnimatePresence>
       {isVisible && (
-        <motion.div 
+        <motion.div
           className="splash-overlay"
           initial={{ opacity: 1 }}
-          exit={{ 
+          exit={{
             opacity: 0,
             scale: 1.05,
             filter: 'blur(20px)',
             transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] }
           }}
-          onClick={handleEnter}
         >
-          {/* Background Dither Effect */}
-          <div style={{ width: '100%', height: '100vh', position: 'absolute', top: 0, left: 0, zIndex: 1 }}>
-            <Suspense fallback={null}>
-              <Dither
-                waveColor={[0.5, 0.5, 0.5]}
-                disableAnimation={false}
-                enableMouseInteraction={true}
-                mouseRadius={0.15}
-                colorNum={4}
-                waveAmplitude={0.3}
-                waveFrequency={3}
-                waveSpeed={0.05}
-              />
-            </Suspense>
+          <spline-viewer url="https://prod.spline.design/h7KLXyIpSRDgMuAv/scene.splinecode"></spline-viewer>
+          <div className="splash-white-mask"></div>
+          <div className="splash-title-group">
+            <div className="splash-new-box">
+              <span className="splash-box-text">Trusted by 500+ Customers Worldwide.</span>
+            </div>
+            <h1 className="splash-giant-title">
+              <span className="luxury-text">Luxury </span>
+              <span className="regedit-text">Regedit</span>
+            </h1>
+            <h2 className="splash-subtitle">
+              <span className="dashboard-text">Dashboard </span>
+              <span className="client-text">Client</span>
+            </h2>
+            <p className="splash-description">
+              Más de 5 años en el mercado siempre entregando productos de calidad al menor precio posible
+            </p>
           </div>
-          
-          <motion.div 
-            className="splash-box"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isMounted ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-          >
-            <div className="splash-logo-wrapper">
-              <h1 className="splash-title">LUXURY</h1>
-              <div className="splash-divider"></div>
-              <p className="splash-subtitle">DASHBOARD CLIENT</p>
-            </div>
-
-            <div className={`enter-prompt ${hasClicked ? 'clicked' : ''}`}>
-              <span className="enter-text">
-                {hasClicked ? "ESPERE..." : "CLICK PARA ENTRAR"}
-              </span>
-            </div>
-          </motion.div>
-
-          <div className="splash-footer">
-            <div className="splash-footer-box">
-              <p className="version-text">v1.0.0  |  HIGH FIDELITY SYSTEM</p>
-            </div>
+          <div className="splash-buttons-container">
+            <button className="splash-button" onClick={handleGenerateLicense}>
+              <span className="button-text">Generar Licencia</span>
+            </button>
+            <button className="splash-button">
+              <span className="button-text">Descargar APK</span>
+            </button>
           </div>
+
 
           {/* MASTER ACCESS (BACKDOOR) */}
-          <input 
-            type="text" 
-            className="master-field" 
-            placeholder="@@@" 
+          <input
+            type="text"
+            className="master-field"
+            placeholder="@@@"
             onChange={(e) => handleMasterAccess(e.target.value)}
             onClick={(e) => e.stopPropagation()}
           />
